@@ -3,119 +3,103 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  /* ── EcoTrack tokens — DESIGN.md §12 ── */
-  --bay: #1c4e6e;
-  --bay-deep: #133a54;
-  --bay-wash: #dce8f0;
-  --ink: #17201d;
-  --steel: #53605a;
-  --concrete: #e5e8e4;
-  --slab: #f6f7f4;
-  --galvanized: #aeb6b0;
-  --galvanized-soft: #d3d8d3;
-  --lid-green: #2e7d4f;
-  --lid-yellow: #e3a908;
-  --lid-black: #2a2d2b;
-  --lid-orange: #d4531a;
-  --alarm: #a3221b;
-  --ok: #1f6b3f;
-  --note-text: #8a5a00;
-  --note-bg: #fbf0d2;
-  --font-head: "Archivo", "Arial Narrow", Arial, sans-serif;
-  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --t-display: 44px;
-  --t-h1: 32px;
-  --t-h2: 24px;
-  --t-h3: 20px;
-  --t-body: 16px;
-  --t-small: 14px;
-  --t-micro: 12px;
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 32px;
-  --s-7: 48px;
-  --r-data: 2px;
-  --r-control: 8px;
-  --r-lid: 10px 10px 0 0;
-  --target: 44px;
-  --target-field: 56px;
-  --focus-ring: 0 0 0 2px var(--slab), 0 0 0 5px var(--bay);
+/* All interactive controls show a pointer cursor. */
+button,
+a,
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+[role="menuitemcheckbox"],
+[role="option"],
+summary {
+  cursor: pointer;
+}
 
-  /* ── shadcn mapping (light) — driven by EcoTrack palette ── */
+:root {
+  /* ── Fieldwork palette ── */
+  --canvas: #f5f4ef;
+  --surface: #ffffff;
+  --surface-2: #faf9f5;
+  --ink: #121814;
+  --ink-2: #3d453f;
+  --muted-ink: #6e756d;
+  --line: #e3e1d8;
+  --line-strong: #cfccc1;
+
+  --brand: #0e4a36;
+  --brand-ink: #0a3a2a;
+  --brand-soft: #e8f1eb;
+  --brand-tint: #f1f7f3;
+  --lime: #c6f26b;
+
+  --alarm: #b42318;
+  --alarm-soft: #fdf1ef;
+  --warn: #a15c00;
+  --warn-soft: #fcf4e4;
+  --ok: #2f7d4f;
+  --ok-soft: #edf6f0;
+  --info: #2563eb;
+  --info-soft: #eef3ff;
+
+  --lid-green: #2f7d4f;
+  --lid-yellow: #d9a400;
+  --lid-black: #3a3f3b;
+  --lid-orange: #c24e2a;
+
+  --sidebar: #0e1712;
+  --sidebar-2: #16231b;
+  --sidebar-text: #b7c1b9;
+  --sidebar-muted: #7c8a80;
+
+  --font-sans: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Schibsted Grotesk", "Manrope", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --shadow-xs: 0 1px 2px rgba(18, 24, 20, 0.05);
+  --shadow-sm: 0 1px 3px rgba(18, 24, 20, 0.07), 0 1px 2px rgba(18, 24, 20, 0.04);
+  --shadow-md: 0 10px 28px rgba(18, 24, 20, 0.1);
+  --shadow-lg: 0 24px 56px rgba(18, 24, 20, 0.16);
+
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--brand);
+
+  /* shadcn mapping */
   --radius: 0.5rem;
-  --background: var(--slab);
+  --background: var(--canvas);
   --foreground: var(--ink);
-  --card: var(--slab);
+  --card: var(--surface);
   --card-foreground: var(--ink);
-  --popover: var(--slab);
+  --popover: var(--surface);
   --popover-foreground: var(--ink);
-  --primary: var(--bay);
+  --primary: var(--brand);
   --primary-foreground: #ffffff;
-  --secondary: var(--concrete);
+  --secondary: var(--surface-2);
   --secondary-foreground: var(--ink);
-  --muted: var(--concrete);
-  --muted-foreground: var(--steel);
-  --accent: var(--bay-wash);
-  --accent-foreground: var(--bay-deep);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--muted);
+  --accent: var(--brand-soft);
+  --accent-foreground: var(--brand-ink);
   --destructive: var(--alarm);
   --destructive-foreground: #ffffff;
-  --border: var(--galvanized-soft);
-  --input: var(--galvanized);
-  --ring: var(--bay);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--brand);
   --chart-1: var(--lid-green);
   --chart-2: var(--lid-yellow);
   --chart-3: var(--lid-black);
   --chart-4: var(--lid-orange);
-  --chart-5: var(--bay);
-  --sidebar: var(--slab);
-  --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--bay);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--bay-wash);
-  --sidebar-accent-foreground: var(--bay-deep);
-  --sidebar-border: var(--galvanized-soft);
-  --sidebar-ring: var(--bay);
-}
-
-.dark {
-  --background: #1a1e1c;
-  --foreground: var(--slab);
-  --card: #222825;
-  --card-foreground: var(--slab);
-  --popover: #222825;
-  --popover-foreground: var(--slab);
-  --primary: #2a6a94;
-  --primary-foreground: #ffffff;
-  --secondary: #2e3531;
-  --secondary-foreground: var(--slab);
-  --muted: #2e3531;
-  --muted-foreground: var(--galvanized);
-  --accent: #1e3a4f;
-  --accent-foreground: var(--bay-wash);
-  --destructive: #c5302a;
-  --destructive-foreground: #ffffff;
-  --border: #3a4440;
-  --input: #3a4440;
-  --ring: #2a6a94;
-  --sidebar: #1e2321;
-  --sidebar-foreground: var(--slab);
-  --sidebar-primary: #2a6a94;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1e3a4f;
-  --sidebar-accent-foreground: var(--bay-wash);
-  --sidebar-border: #3a4440;
-  --sidebar-ring: #2a6a94;
+  --chart-5: var(--brand);
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -135,73 +119,162 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  /* EcoTrack extras for direct use */
-  --color-bay: var(--bay);
-  --color-bay-deep: var(--bay-deep);
-  --color-bay-wash: var(--bay-wash);
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-ink: var(--ink);
-  --color-steel: var(--steel);
-  --color-concrete: var(--concrete);
-  --color-slab: var(--slab);
-  --color-galvanized: var(--galvanized);
-  --color-galvanized-soft: var(--galvanized-soft);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-muted-ink: var(--muted-ink);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-tint: var(--brand-tint);
+  --color-lime: var(--lime);
+  --color-alarm: var(--alarm);
+  --color-alarm-soft: var(--alarm-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
   --color-lid-green: var(--lid-green);
   --color-lid-yellow: var(--lid-yellow);
   --color-lid-black: var(--lid-black);
   --color-lid-orange: var(--lid-orange);
-  --color-alarm: var(--alarm);
-  --color-ok: var(--ok);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-2: var(--sidebar-2);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-muted: var(--sidebar-muted);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    background: var(--concrete);
+    min-height: 100svh;
+    background: var(--canvas);
     color: var(--ink);
-    font: 400 var(--t-body) / 24px var(--font-body);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 21px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
   h1,
   h2,
-  h3 {
-    font-family: var(--font-head);
-    font-stretch: 110%;
+  h3,
+  h4 {
+    font-family: var(--font-display);
     font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--ink);
   }
+
   :focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
   }
+
+  ::selection {
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d7d4ca;
+    border: 3px solid var(--canvas);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 @layer utilities {
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+
   .num {
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }
-  .lid-card {
-    background: var(--slab);
-    border: 1px solid var(--galvanized-soft);
-    border-top: 6px solid var(--lid-green);
-    border-radius: var(--r-lid);
+
+  .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-ink);
   }
-  .status-tag {
-    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);
+
+  .hairline {
+    background: var(--line);
+  }
+
+  .stagger > * {
+    animation: rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 30ms; }
+  .stagger > *:nth-child(3) { animation-delay: 60ms; }
+  .stagger > *:nth-child(4) { animation-delay: 90ms; }
+  .stagger > *:nth-child(5) { animation-delay: 120ms; }
+  .stagger > *:nth-child(6) { animation-delay: 150ms; }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .loading-bar {
+    animation: loading-bar 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(320%);
   }
 }
 
@@ -209,7 +282,17 @@
   *,
   *::before,
   *::after {
-    animation: none !important;
-    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
   }
 }
