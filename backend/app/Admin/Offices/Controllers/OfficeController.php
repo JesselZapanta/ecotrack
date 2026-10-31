@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Office;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OfficeController extends Controller
 {
@@ -17,6 +18,8 @@ class OfficeController extends Controller
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
             'location_id' => ['nullable', 'integer', 'exists:locations,id'],
+            'type' => ['nullable', Rule::in(Office::TYPES)],
+            'status' => ['nullable', 'in:Active,Inactive'],
             'sort' => ['nullable', 'in:id,name,created_at'],
             'direction' => ['nullable', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
@@ -36,6 +39,14 @@ class OfficeController extends Controller
 
         if (! empty($validated['location_id'])) {
             $query->where('location_id', $validated['location_id']);
+        }
+
+        if (! empty($validated['type'])) {
+            $query->where('type', $validated['type']);
+        }
+
+        if (! empty($validated['status'])) {
+            $query->where('status', $validated['status']);
         }
 
         $sort = $validated['sort'] ?? 'id';

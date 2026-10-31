@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Categories;
+namespace Database\Seeders;
 
 use App\Models\WasteCategory;
 use Illuminate\Database\Seeder;

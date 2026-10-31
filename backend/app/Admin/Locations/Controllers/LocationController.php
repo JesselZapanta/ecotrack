@@ -22,7 +22,7 @@ class LocationController extends Controller
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $query = Location::query()->with(['offices' => fn ($builder) => $builder->select('id', 'name', 'location_id')->orderBy('name')]);
+        $query = Location::query()->with(['offices' => fn ($builder) => $builder->select('id', 'name', 'type', 'location_id')->orderBy('name')]);
 
         if (! empty($validated['search'])) {
             $term = '%'.$validated['search'].'%';

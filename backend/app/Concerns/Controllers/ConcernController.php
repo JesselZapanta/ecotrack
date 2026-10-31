@@ -43,8 +43,6 @@ class ConcernController extends Controller
                     $builder->orWhere('office_id', $user->office_id);
                 }
             });
-        } elseif ($user->isMaintenance()) {
-            $query->where('reported_by', $user->id);
         }
 
         if (! empty($validated['search'])) {
@@ -186,12 +184,6 @@ class ConcernController extends Controller
             if (! $sameOffice && ! $ownReport) {
                 return response()->json(['message' => 'You can only view concerns reported by your office.'], 403);
             }
-
-            return null;
-        }
-
-        if ((int) $concern->reported_by !== (int) $user->id) {
-            return response()->json(['message' => 'You can only view the concerns you reported.'], 403);
         }
 
         return null;

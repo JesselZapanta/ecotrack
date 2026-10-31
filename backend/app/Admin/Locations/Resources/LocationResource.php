@@ -2,6 +2,7 @@
 
 namespace App\Admin\Locations\Resources;
 
+use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,10 +19,13 @@ class LocationResource extends JsonResource
             'building' => $this->building,
             'floor_or_area' => $this->floor_or_area,
             'is_active' => (bool) $this->is_active,
-            'offices' => $this->whenLoaded('offices', fn () => $this->offices->map(fn ($office) => [
-                'id' => $office->id,
-                'name' => $office->name,
-            ])),
+            'offices' => $this->whenLoaded('offices', fn () => $this->offices
+                ->where('type', Office::TYPE_OFFICE)
+                ->map(fn ($office) => [
+                    'id' => $office->id,
+                    'name' => $office->name,
+                ])
+                ->values()),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

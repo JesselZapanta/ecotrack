@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Audit;
+namespace Database\Seeders;
 
 use App\Models\AuditLog;
 use App\Models\User;

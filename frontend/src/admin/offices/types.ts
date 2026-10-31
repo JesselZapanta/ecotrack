@@ -1,3 +1,6 @@
+export const OFFICE_TYPES = ["Office", "Lecture Room", "Laboratory", "Facility"] as const
+export type OfficeType = (typeof OFFICE_TYPES)[number]
+
 export type ApiOffice = {
   id: number
   name: string
@@ -45,6 +48,7 @@ export type OfficePayload = {
 export type OfficesQuery = {
   search: string
   locationId: string
+  type: string
   sort: SortColumn
   direction: SortDirection
   perPage: number

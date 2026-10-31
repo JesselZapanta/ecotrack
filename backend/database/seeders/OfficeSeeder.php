@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Offices;
+namespace Database\Seeders;
 
 use App\Models\Location;
 use App\Models\Office;
@@ -11,6 +11,8 @@ class OfficeSeeder extends Seeder
     public function run(): void
     {
         $locations = Location::pluck('id', 'name');
+
+        Office::where('name', 'PFOM')->update(['name' => 'PFOM Office']);
 
         foreach ($this->groups() as $locationName => $rooms) {
             $locationId = $locations[$locationName] ?? null;
@@ -97,7 +99,7 @@ class OfficeSeeder extends Seeder
                 ['room_name' => 'MB-105', 'floor' => 'Ground Floor', 'type' => 'Lecture Room', 'status' => 'Active'],
                 ['room_name' => 'MB-103 (Demo Room)', 'floor' => 'Ground Floor', 'type' => 'Lecture Room', 'status' => 'Active'],
                 ['room_name' => 'MB-102 (Midwifery Skills Laboratory)', 'floor' => 'Ground Floor', 'type' => 'Laboratory', 'status' => 'Active'],
-                ['room_name' => 'PFOM', 'floor' => 'Ground Floor', 'type' => 'Office', 'status' => 'Active'],
+                ['room_name' => 'PFOM Office', 'floor' => 'Ground Floor', 'type' => 'Office', 'status' => 'Active'],
                 ['room_name' => 'Maintenance/Student Assistant', 'floor' => 'Ground Floor', 'type' => 'Office', 'status' => 'Active'],
                 ['room_name' => 'Dance Studio', 'floor' => 'Ground Floor', 'type' => 'Laboratory', 'status' => 'Active'],
                 ['room_name' => 'Music Room', 'floor' => 'Ground Floor', 'type' => 'Laboratory', 'status' => 'Active'],

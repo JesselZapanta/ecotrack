@@ -90,7 +90,7 @@ export function OfficesTable({
           <TableHeader>
             <TableRow>
               <SortHead label="ID" column="id" currentSort={sort} direction={direction} onSort={onSort} className="pl-5" />
-              <SortHead label="Office" column="name" currentSort={sort} direction={direction} onSort={onSort} />
+              <SortHead label="Room / office" column="name" currentSort={sort} direction={direction} onSort={onSort} />
               <TableHead>Contact person</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Status</TableHead>
@@ -151,8 +151,8 @@ export function OfficesTable({
               <TableRow>
                 <TableCell colSpan={6} className="py-14 text-center">
                   <Building2 className="mx-auto mb-2 size-5 text-muted-ink" />
-                  <p className="text-[13px] text-ink">No offices match that search</p>
-                  <p className="mt-1 text-[11.5px] text-muted-ink">Clear the search or add a new office.</p>
+                  <p className="text-[13px] text-ink">No rooms match that search</p>
+                  <p className="mt-1 text-[11.5px] text-muted-ink">Clear the search or add a new room.</p>
                 </TableCell>
               </TableRow>
             )}

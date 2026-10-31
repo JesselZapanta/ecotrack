@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Schedules;
+namespace Database\Seeders;
 
 use App\Models\CollectionSchedule;
 use App\Models\Location;

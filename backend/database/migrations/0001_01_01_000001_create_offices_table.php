@@ -12,13 +12,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('floor')->nullable();
-            $table->string('type', 50)->nullable();
+            $table->string('type', 50)->default('Office');
             $table->string('status', 20)->default('Active');
             $table->string('contact_person')->nullable();
             $table->foreignId('location_id')->constrained('locations')->restrictOnDelete();
             $table->timestamps();
 
             $table->unique(['name', 'location_id']);
+            $table->index('type');
         });
     }
 

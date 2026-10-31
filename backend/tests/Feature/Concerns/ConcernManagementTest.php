@@ -204,7 +204,7 @@ it('scopes the office list to its own office', function () {
     expect($response->json('data.0.reporter.name'))->toBe('Office - Education');
 });
 
-it('scopes maintenance users to the concerns they reported', function () {
+it('lets maintenance users see all concerns', function () {
     makeConcern($this->mainBuilding->id, $this->educ->id);
     makeConcern($this->mainBuilding->id, $this->ben->id, [
         'description' => 'Broken wheel on the green bin.',
@@ -213,8 +213,10 @@ it('scopes maintenance users to the concerns they reported', function () {
     $response = $this->actingAs($this->ben, 'api')
         ->getJson('/api/concerns');
 
-    $response->assertOk()->assertJsonPath('meta.total', 1);
-    expect($response->json('data.0.reporter.name'))->toBe('Mang Ben');
+    $response->assertOk()->assertJsonPath('meta.total', 2);
+    expect(collect($response->json('data'))->pluck('reporter.name')->all())
+        ->toContain('Office - Education')
+        ->toContain('Mang Ben');
 });
 
 it('lets the admin acknowledge and resolve a concern', function () {
@@ -278,19 +280,40 @@ it('clears the resolution when a concern is reopened', function () {
     expect($fresh->resolved_at)->toBeNull();
 });
 
-it('rejects status changes from non-admin users', function () {
+it('lets maintenance update concern status', function () {
+    $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
+
+    $this->actingAs($this->ben, 'api')
+        ->patchJson("/api/concerns/{$concern->id}/status", ['status' => Concern::STATUS_ACKNOWLEDGED])
+        ->assertOk()
+        ->assertJsonPath('concern.status', Concern::STATUS_ACKNOWLEDGED);
+
+    $this->actingAs($this->ben, 'api')
+        ->patchJson("/api/concerns/{$concern->id}/status", [
+            'status' => Concern::STATUS_RESOLVED,
+            'resolution_note' => 'Crew cleared the collection point.',
+        ])
+        ->assertOk()
+        ->assertJsonPath('concern.status', Concern::STATUS_RESOLVED)
+        ->assertJsonPath('concern.resolved_by.name', 'Mang Ben');
+
+    $fresh = $concern->fresh();
+    expect($fresh->resolved_by)->toBe($this->ben->id);
+    expect($fresh->resolution_note)->toBe('Crew cleared the collection point.');
+});
+
+it('rejects status changes from office users', function () {
     $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
 
     $this->actingAs($this->educ, 'api')
-        ->patchJson("/api/concerns/{$concern->id}/status", ['status' => Concern::STATUS_RESOLVED])
-        ->assertForbidden();
-
-    $this->actingAs($this->ben, 'api')
-        ->patchJson("/api/concerns/{$concern->id}/status", ['status' => Concern::STATUS_RESOLVED])
+        ->patchJson("/api/concerns/{$concern->id}/status", [
+            'status' => Concern::STATUS_RESOLVED,
+            'resolution_note' => 'Office cannot resolve.',
+        ])
         ->assertForbidden();
 });
 
-it('blocks viewing a concern outside the user scope', function () {
+it('restricts concern access to the right scope', function () {
     $concern = makeConcern($this->mainBuilding->id, $this->science->id, [
         'description' => 'Chairs blocking the collection point.',
     ]);
@@ -301,7 +324,7 @@ it('blocks viewing a concern outside the user scope', function () {
 
     $this->actingAs($this->ben, 'api')
         ->getJson("/api/concerns/{$concern->id}")
-        ->assertForbidden();
+        ->assertOk();
 
     $this->actingAs($this->admin, 'api')
         ->getJson("/api/concerns/{$concern->id}")

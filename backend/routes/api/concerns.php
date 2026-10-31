@@ -10,6 +10,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('concerns/{concern}', [ConcernController::class, 'show']);
 });
 
-Route::middleware(['auth:api', 'role:admin'])->group(function () {
+Route::middleware(['auth:api', 'role:admin,maintenance'])->group(function () {
     Route::patch('concerns/{concern}/status', [ConcernController::class, 'status']);
 });

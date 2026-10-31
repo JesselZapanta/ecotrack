@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Concerns;
+namespace Database\Seeders;
 
 use App\Models\Concern;
 use App\Models\Location;

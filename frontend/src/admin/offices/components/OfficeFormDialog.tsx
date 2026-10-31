@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { apiMessage, createOffice, updateOffice } from "@/admin/offices/api"
+import { OFFICE_TYPES } from "@/admin/offices/types"
 import type { ApiOffice, LocationOption } from "@/admin/offices/types"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -20,7 +21,7 @@ export function OfficeFormDialog({ editing, locations, onClose, onSaved }: Props
   const [form, setForm] = useState({
     name: editing?.name ?? "",
     floor: editing?.floor ?? "",
-    type: editing?.type ?? "",
+    type: editing?.type ?? "Office",
     status: editing?.status ?? "Active",
     contact: editing?.contact_person ?? "",
     locationId: editing?.location_id ? String(editing.location_id) : "",
@@ -45,7 +46,7 @@ export function OfficeFormDialog({ editing, locations, onClose, onSaved }: Props
     const payload = {
       name: form.name.trim(),
       floor: form.floor.trim() || null,
-      type: form.type.trim() || null,
+      type: form.type || null,
       status: form.status,
       contact_person: form.contact.trim() || null,
       location_id: Number(form.locationId),
@@ -75,19 +76,20 @@ export function OfficeFormDialog({ editing, locations, onClose, onSaved }: Props
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit office" : "Add office"}</DialogTitle>
+          <DialogTitle>{editing ? "Edit room or office" : "Add room or office"}</DialogTitle>
           <DialogDescription>
-            Each office belongs to a location, which scopes what office accounts can see.
+            Offices can be assigned to user accounts; rooms, labs and facilities are reference data.
+            Each entry belongs to a location.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Office / room name</Label>
+            <Label>Name</Label>
             <Input
               value={form.name}
               onChange={(event) => setForm({ ...form, name: event.target.value })}
-              placeholder="e.g. AB-102"
+              placeholder="e.g. MB-105 or College Registrar"
             />
           </div>
 
@@ -101,12 +103,22 @@ export function OfficeFormDialog({ editing, locations, onClose, onSaved }: Props
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Type (optional)</Label>
-              <Input
+              <Label>Type</Label>
+              <Select
                 value={form.type}
-                onChange={(event) => setForm({ ...form, type: event.target.value })}
-                placeholder="e.g. Lecture Room"
-              />
+                onValueChange={(value) => setForm({ ...form, type: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {OFFICE_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

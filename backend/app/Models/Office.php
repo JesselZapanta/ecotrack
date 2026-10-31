@@ -11,6 +11,21 @@ class Office extends Model
 {
     use HasFactory;
 
+    public const TYPE_OFFICE = 'Office';
+
+    public const TYPE_LECTURE_ROOM = 'Lecture Room';
+
+    public const TYPE_LABORATORY = 'Laboratory';
+
+    public const TYPE_FACILITY = 'Facility';
+
+    public const TYPES = [
+        self::TYPE_OFFICE,
+        self::TYPE_LECTURE_ROOM,
+        self::TYPE_LABORATORY,
+        self::TYPE_FACILITY,
+    ];
+
     protected $fillable = [
         'name',
         'floor',

@@ -12,6 +12,8 @@ export async function getSchedules(
       category_id: query.categoryId !== "all" ? query.categoryId : undefined,
       location_id: query.locationId !== "all" ? query.locationId : undefined,
       date: query.date || undefined,
+      date_from: query.dateFrom || undefined,
+      date_to: query.dateTo || undefined,
       sort: query.sort,
       direction: query.direction,
       per_page: query.perPage,

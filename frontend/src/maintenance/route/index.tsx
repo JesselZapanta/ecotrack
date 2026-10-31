@@ -23,6 +23,13 @@ import { AlertCircle, CheckCircle2, Loader2, MapPin, XCircle } from "lucide-reac
 
 const REASONS = ["Rain", "Bin not accessible", "Needs extra trip", "Other"]
 
+function inputDate(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
 export default function MyCollections() {
   const { userName } = useAuth()
   const [schedules, setSchedules] = useState<ApiSchedule[]>([])
@@ -34,10 +41,12 @@ export default function MyCollections() {
   const [statusTarget, setStatusTarget] = useState<ApiSchedule | null>(null)
   const [missed, setMissed] = useState<ApiSchedule | null>(null)
   const [reason, setReason] = useState("")
+  const [detail, setDetail] = useState("")
   const [savingMissed, setSavingMissed] = useState(false)
 
   useEffect(() => {
     let cancelled = false
+    const today = inputDate(new Date())
 
     sweepSchedules()
       .then((result) => {
@@ -47,23 +56,35 @@ export default function MyCollections() {
       .catch(() => {})
       .finally(() => {
         if (cancelled) return
-        const today = new Date().toISOString().slice(0, 10)
-        getSchedules({
-          search: "",
-          status: "all",
-          categoryId: "all",
-          locationId: "all",
-          date: "",
-          sort: "scheduled_date",
-          direction: "asc",
-          perPage: 50,
-          page: 1,
-        })
-          .then(({ data }) => {
+
+        Promise.all([
+          getSchedules({
+            search: "",
+            status: "all",
+            categoryId: "all",
+            locationId: "all",
+            date: today,
+            sort: "scheduled_date",
+            direction: "asc",
+            perPage: 50,
+            page: 1,
+          }),
+          getSchedules({
+            search: "",
+            status: "Missed",
+            categoryId: "all",
+            locationId: "all",
+            date: "",
+            sort: "scheduled_date",
+            direction: "desc",
+            perPage: 100,
+            page: 1,
+          }),
+        ])
+          .then(([todayResult, missedResult]) => {
             if (cancelled) return
-            const all = data.filter((schedule) => schedule.status === "Scheduled" || schedule.status === "Missed")
-            setSchedules(all.filter((schedule) => schedule.scheduled_date === today))
-            setMissedRuns(all.filter((schedule) => schedule.status === "Missed"))
+            setSchedules(todayResult.data)
+            setMissedRuns(missedResult.data)
             setError(null)
           })
           .catch((err) => {
@@ -85,9 +106,8 @@ export default function MyCollections() {
   }
 
   const missedCount = missedRuns.length
-  const next =
-    schedules.find((schedule) => schedule.status === "Missed") ??
-    schedules.find((schedule) => schedule.status === "Scheduled")
+  const collectedToday = schedules.filter((schedule) => schedule.status === "Collected").length
+  const next = schedules.find((schedule) => schedule.status === "Scheduled") ?? null
   const ordered = [...schedules].sort((a, b) => {
     const rank = (s: string) => (s === "Missed" ? 0 : s === "Scheduled" ? 1 : 2)
     const r = rank(a.status) - rank(b.status)
@@ -106,17 +126,20 @@ export default function MyCollections() {
   const confirmMissed = async () => {
     if (!missed) return
 
-    if (!reason.trim()) {
-      toast.error("Pick a reason before confirming.")
+    const remark = reason === "Other" ? detail.trim() : reason.trim()
+
+    if (!remark) {
+      toast.error(reason === "Other" ? "Add a short detail for Other." : "Pick a reason before confirming.")
       return
     }
 
     setSavingMissed(true)
     try {
-      const result = await updateScheduleStatus(missed.id, "Missed", reason)
+      const result = await updateScheduleStatus(missed.id, "Missed", remark)
       toast.success(result.message)
       setMissed(null)
       setReason("")
+      setDetail("")
       refresh()
     } catch (err) {
       toast.error(apiMessage(err))
@@ -130,7 +153,7 @@ export default function MyCollections() {
       <PageHeader
         eyebrow="Field route"
         title="Dashboard"
-        subtitle={`Today's route · ${schedules.length} runs · ${missedCount} missed · ${userName}`}
+        subtitle={`Today's route · ${schedules.length} runs · ${collectedToday} collected · ${missedCount} missed total · ${userName}`}
         actions={
           <Button asChild variant="outline" size="sm">
             <Link to="/maintenance/schedules">Full schedule</Link>
@@ -203,11 +226,13 @@ export default function MyCollections() {
             </Card>
           )}
 
-          <Card>
-            <CardContent className="pt-5">
-              <RouteStrip stops={stops} collected={0} total={schedules.length} compact />
-            </CardContent>
-          </Card>
+          {schedules.length > 0 && (
+            <Card>
+              <CardContent className="pt-5">
+                <RouteStrip stops={stops} collected={collectedToday} total={schedules.length} compact />
+              </CardContent>
+            </Card>
+          )}
 
           {next && (
             <Card className={`border-l-[3px] ${next.status === "Missed" ? "border-l-alarm" : "border-l-brand"}`}>
@@ -249,6 +274,7 @@ export default function MyCollections() {
                       onClick={() => {
                         setMissed(next)
                         setReason("")
+                        setDetail("")
                       }}
                     >
                       <XCircle className="size-4" /> Mark as missed
@@ -272,7 +298,7 @@ export default function MyCollections() {
               <div className="divide-y divide-line">
                 {schedules.length === 0 && (
                   <p className="px-4 py-10 text-center text-[12.5px] text-muted-ink">
-                    No scheduled or missed runs for today.
+                    No runs for today.
                   </p>
                 )}
 
@@ -334,7 +360,16 @@ export default function MyCollections() {
         />
       )}
 
-      <Dialog open={!!missed} onOpenChange={(isOpen) => !isOpen && !savingMissed && setMissed(null)}>
+      <Dialog
+        open={!!missed}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !savingMissed) {
+            setMissed(null)
+            setReason("")
+            setDetail("")
+          }
+        }}
+      >
         <DialogContent className="max-h-[92dvh] max-w-[460px] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Mark as missed</DialogTitle>
@@ -362,13 +397,21 @@ export default function MyCollections() {
             </div>
             <Textarea
               placeholder="Add detail (required if you picked Other)"
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
+              value={detail}
+              onChange={(event) => setDetail(event.target.value)}
             />
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setMissed(null)} disabled={savingMissed}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setMissed(null)
+                setReason("")
+                setDetail("")
+              }}
+              disabled={savingMissed}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={confirmMissed} disabled={savingMissed}>

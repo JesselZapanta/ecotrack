@@ -85,17 +85,24 @@ export function AdminLayout() {
       </div>
 
       <div className="border-t border-white/10 p-2.5">
-        <div className="flex items-center gap-2.5 rounded-[8px] px-2 py-2">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[10.5px] font-semibold text-white">
-            {userName.slice(0, 2).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[12px] leading-tight font-medium text-white">{userName}</p>
-            <p className="truncate text-[10px] text-sidebar-muted">{ROLE_LABEL[role]}</p>
-          </div>
+        <div className="flex items-center gap-1 rounded-[8px] px-1 py-1">
+          <Link
+            to="/admin/account"
+            title="My account"
+            aria-label="My account"
+            className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[6px] px-1.5 py-1.5 outline-none transition-colors hover:bg-white/5 focus-visible:shadow-[var(--focus-ring)]"
+          >
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[10.5px] font-semibold text-white">
+              {userName.slice(0, 2).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[12px] leading-tight font-medium text-white">{userName}</p>
+              <p className="truncate text-[10px] text-sidebar-muted">{ROLE_LABEL[role]}</p>
+            </div>
+          </Link>
           <button
             onClick={handleLogout}
-            className="flex size-7 items-center justify-center rounded-[6px] text-sidebar-muted transition-colors hover:bg-white/10 hover:text-white"
+            className="flex size-7 shrink-0 items-center justify-center rounded-[6px] text-sidebar-muted transition-colors hover:bg-white/10 hover:text-white"
             aria-label="Log out"
           >
             <LogOut className="size-3.5" />
@@ -149,9 +156,14 @@ export function AdminLayout() {
             <Button variant="ghost" size="icon-sm" className="sm:hidden" onClick={() => setSearchOpen(true)}>
               <Search className="size-4" />
             </Button>
-            <div className="ml-1 flex size-8 items-center justify-center rounded-full border border-line bg-surface text-[10.5px] font-semibold text-ink">
+            <Link
+              to="/admin/account"
+              title="My account"
+              aria-label="My account"
+              className="ml-1 flex size-8 items-center justify-center rounded-full border border-line bg-surface text-[10.5px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
+            >
               {userName.slice(0, 2).toUpperCase()}
-            </div>
+            </Link>
           </div>
         </div>
       </header>

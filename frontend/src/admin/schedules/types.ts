@@ -75,6 +75,8 @@ export type SchedulesQuery = {
   categoryId: string
   locationId: string
   date: string
+  dateFrom?: string
+  dateTo?: string
   sort: SortColumn
   direction: SortDirection
   perPage: number

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { LocationOption } from "@/admin/offices/types"
+import { OFFICE_TYPES, type LocationOption } from "@/admin/offices/types"
 import { Loader2, Search } from "lucide-react"
 
 type Props = {
@@ -9,6 +9,8 @@ type Props = {
   onQueryChange: (value: string) => void
   location: string
   onLocationChange: (value: string) => void
+  type: string
+  onTypeChange: (value: string) => void
   locations: LocationOption[]
   loading: boolean
   filtersActive: boolean
@@ -20,6 +22,8 @@ export function OfficesToolbar({
   onQueryChange,
   location,
   onLocationChange,
+  type,
+  onTypeChange,
   locations,
   loading,
   filtersActive,
@@ -49,6 +53,20 @@ export function OfficesToolbar({
           {locations.map((item) => (
             <SelectItem key={item.id} value={String(item.id)}>
               {item.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={type} onValueChange={onTypeChange}>
+        <SelectTrigger className="w-full sm:w-[160px]">
+          <SelectValue placeholder="Type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All types</SelectItem>
+          {OFFICE_TYPES.map((item) => (
+            <SelectItem key={item} value={item}>
+              {item}
             </SelectItem>
           ))}
         </SelectContent>

@@ -21,6 +21,7 @@ export default function Offices() {
   const [query, setQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const [location, setLocation] = useState("all")
+  const [type, setType] = useState("all")
   const [sort, setSort] = useState<SortColumn>("id")
   const [direction, setDirection] = useState<SortDirection>("desc")
   const [page, setPage] = useState(1)
@@ -52,6 +53,7 @@ export default function Offices() {
     getOffices({
       search: debouncedQuery,
       locationId: location,
+      type,
       sort,
       direction,
       perPage,
@@ -73,7 +75,7 @@ export default function Offices() {
     return () => {
       cancelled = true
     }
-  }, [debouncedQuery, location, sort, direction, page, perPage, refreshKey])
+  }, [debouncedQuery, location, type, sort, direction, page, perPage, refreshKey])
 
   const refresh = () => {
     setLoading(true)
@@ -120,26 +122,27 @@ export default function Offices() {
     setQuery("")
     setDebouncedQuery("")
     setLocation("all")
+    setType("all")
     setPage(1)
   }
 
-  const filtersActive = query !== "" || location !== "all"
+  const filtersActive = query !== "" || location !== "all" || type !== "all"
 
   return (
     <div className="space-y-5">
       <PageHeader
         eyebrow="Master data"
-        title="Offices"
+        title="Rooms & Offices"
         subtitle={
           loading
-            ? "Updating offices…"
+            ? "Updating rooms…"
             : meta
-              ? `${meta.total} offices · server-side search and pagination`
-              : "Loading offices…"
+              ? `${meta.total} spaces · server-side search and pagination`
+              : "Loading rooms…"
         }
         actions={
           <Button onClick={openCreate}>
-            <Plus className="size-4" /> Add office
+            <Plus className="size-4" /> Add room
           </Button>
         }
       />
@@ -154,6 +157,12 @@ export default function Offices() {
         onLocationChange={(value) => {
           setLoading(true)
           setLocation(value)
+          setPage(1)
+        }}
+        type={type}
+        onTypeChange={(value) => {
+          setLoading(true)
+          setType(value)
           setPage(1)
         }}
         locations={locations}

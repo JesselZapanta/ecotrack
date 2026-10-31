@@ -21,7 +21,7 @@ export async function getUsers(query: UsersQuery): Promise<{ data: ApiUser[]; me
 
 export async function getOffices(): Promise<OfficeOption[]> {
   const { data } = await api.get<{ data: OfficeOption[] }>("/offices", {
-    params: { per_page: 100, sort: "name", direction: "asc" },
+    params: { per_page: 100, sort: "name", direction: "asc", type: "Office", status: "Active" },
   })
   return data.data
 }

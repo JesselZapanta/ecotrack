@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\WasteRecords;
+namespace Database\Seeders;
 
 use App\Models\CollectionSchedule;
 use App\Models\User;
@@ -40,7 +40,7 @@ class WasteRecordSeeder extends Seeder
                         : substr((string) $schedule->scheduled_date, 0, 10),
                     'quantity_kg' => $quantities[$index % count($quantities)],
                     'remarks' => null,
-                    'created_by' => $admin?->id,
+                    'created_by' => $schedule->assigned_to ?? $admin?->id,
                 ]
             );
         }

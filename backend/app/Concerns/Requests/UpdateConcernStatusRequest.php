@@ -10,7 +10,9 @@ class UpdateConcernStatusRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+
+        return $user !== null && ($user->isAdmin() || $user->isMaintenance());
     }
 
     /**

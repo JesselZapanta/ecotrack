@@ -59,6 +59,35 @@ it('filters offices by location', function () {
         ->assertJsonPath('data.0.location.name', 'Library');
 });
 
+it('filters offices by type', function () {
+    Office::create(['name' => 'Registrar', 'type' => 'Office', 'location_id' => $this->location->id]);
+    Office::create(['name' => 'MB-105', 'type' => 'Lecture Room', 'location_id' => $this->location->id]);
+    Office::create(['name' => 'Science Lab', 'type' => 'Laboratory', 'location_id' => $this->location->id]);
+
+    $this->actingAs($this->admin, 'api')
+        ->getJson('/api/offices?type='.urlencode('Lecture Room'))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.name', 'MB-105');
+
+    $this->actingAs($this->admin, 'api')
+        ->getJson('/api/offices?type=Office')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.name', 'Registrar');
+});
+
+it('validates the office type', function () {
+    $this->actingAs($this->admin, 'api')
+        ->postJson('/api/offices', [
+            'name' => 'Garage',
+            'type' => 'Garage',
+            'location_id' => $this->location->id,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('type');
+});
+
 it('creates an office inside a location', function () {
     $library = Location::create(['name' => 'Library', 'building' => 'Library']);
 

@@ -7,6 +7,7 @@ export async function getOffices(query: OfficesQuery): Promise<{ data: ApiOffice
     params: {
       search: query.search || undefined,
       location_id: query.locationId !== "all" ? query.locationId : undefined,
+      type: query.type !== "all" ? query.type : undefined,
       sort: query.sort,
       direction: query.direction,
       per_page: query.perPage,

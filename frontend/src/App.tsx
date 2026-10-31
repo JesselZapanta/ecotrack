@@ -3,6 +3,7 @@ import { AuthProvider } from "@/lib/store"
 import { PublicOnly, RequireAuth, RoleHomeRedirect, RoleRoute } from "@/auth/require-auth"
 import { RoleLayout } from "@/components/RoleLayout"
 import LoginPage from "@/auth/login"
+import LandingPage from "@/landing"
 import AdminDashboardPage from "@/admin/dashboard"
 import MaintenanceDashboardPage from "@/maintenance/dashboard"
 import OfficeDashboardPage from "@/office/dashboard"
@@ -12,6 +13,8 @@ import AdminSchedulesPage from "@/admin/schedules"
 import OfficeSchedulesPage from "@/office/schedules"
 import OfficeConcernsPage from "@/office/concerns"
 import MaintenanceSchedulesPage from "@/maintenance/schedules"
+import MaintenanceReportsPage from "@/maintenance/reports"
+import MaintenanceConcernsPage from "@/maintenance/concerns"
 import ConcernsPage from "@/admin/concerns"
 import AdminReportsPage from "@/admin/reports"
 import OfficeReportsPage from "@/office/reports"
@@ -29,14 +32,14 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
+
           <Route element={<PublicOnly />}>
             <Route path="/login" element={<LoginPage />} />
           </Route>
 
           <Route element={<RequireAuth />}>
             <Route element={<RoleLayout />}>
-              <Route index element={<RoleHomeRedirect />} />
-
               <Route element={<RoleRoute role="admin" />}>
                 <Route path="admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="admin/users" element={<UsersPage />} />
@@ -48,7 +51,6 @@ export default function App() {
                 <Route path="admin/offices" element={<OfficesPage />} />
                 <Route path="admin/categories" element={<CategoriesPage />} />
                 <Route path="admin/audit" element={<AuditLogPage />} />
-                <Route path="admin/report-concern" element={<ReportConcernPage />} />
                 <Route path="admin/account" element={<AccountPage />} />
               </Route>
 
@@ -66,11 +68,12 @@ export default function App() {
                 <Route path="maintenance/dashboard" element={<MaintenanceDashboardPage />} />
                 <Route path="maintenance/my-collections" element={<Navigate to="/maintenance/dashboard" replace />} />
                 <Route path="maintenance/schedules" element={<MaintenanceSchedulesPage />} />
-                <Route path="maintenance/report-concern" element={<ReportConcernPage />} />
+                <Route path="maintenance/reports" element={<MaintenanceReportsPage />} />
+                <Route path="maintenance/concerns" element={<MaintenanceConcernsPage />} />
                 <Route path="maintenance/account" element={<AccountPage />} />
               </Route>
 
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<RoleHomeRedirect />} />
             </Route>
           </Route>
         </Routes>
