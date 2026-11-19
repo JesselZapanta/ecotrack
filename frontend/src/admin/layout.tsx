@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { useAuth, ROLE_LABEL } from "@/lib/store"
 import { BrandMark, BrandName } from "@/components/brand/Logo"
 import { Button } from "@/components/ui/button"
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { adminNav } from "@/components/nav"
+import { SideNavLinks } from "@/components/SideNavLinks"
 import { LogOut, Menu, Search } from "lucide-react"
 import { toast } from "sonner"
 
@@ -56,32 +57,7 @@ export function AdminLayout() {
         <p className="px-2.5 pt-2 pb-2 text-[9.5px] font-semibold tracking-[0.12em] text-sidebar-muted uppercase">
           Manage
         </p>
-        <nav className="space-y-0.5">
-          {adminNav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/admin/dashboard"}
-              className={({ isActive }) =>
-                `relative flex items-center gap-2.5 rounded-[7px] px-2.5 py-2 text-[12.5px] font-medium transition-colors ${
-                  isActive
-                    ? "bg-sidebar-2 text-white"
-                    : "text-sidebar-text hover:bg-white/5 hover:text-white"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <span className="absolute top-1/2 left-0 h-3.5 w-[2px] -translate-y-1/2 rounded-full bg-lime" />
-                  )}
-                  <span className={isActive ? "text-white" : "text-sidebar-muted"}>{item.icon}</span>
-                  <span className="truncate">{item.label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+        <SideNavLinks items={adminNav} />
       </div>
 
       <div className="border-t border-white/10 p-2.5">
@@ -136,7 +112,7 @@ export function AdminLayout() {
             </Sheet>
 
             <div className="flex items-center gap-2 text-[12px] text-muted-ink">
-              <span className="hidden sm:inline">EcoTrack</span>
+              <span className="hidden sm:inline">TCGC EcoTrack</span>
               <span className="hidden text-line-strong sm:inline">/</span>
               <span className="truncate font-medium text-ink">{current?.label ?? "Overview"}</span>
             </div>

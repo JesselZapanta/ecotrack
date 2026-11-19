@@ -36,7 +36,7 @@ class ScheduleSeeder extends Seeder
                 'assignee' => $ben->id,
                 'status' => CollectionSchedule::STATUS_SCHEDULED,
                 'notes' => 'Main lobby pickup',
-                'locations' => ['Main Building — Ground Floor — Left Side'],
+                'locations' => ['Main Building — Ground Floor — Left Wing'],
                 'categories' => ['Recyclable'],
             ],
             [
@@ -47,7 +47,7 @@ class ScheduleSeeder extends Seeder
                 'assignee' => $ben->id,
                 'status' => CollectionSchedule::STATUS_SCHEDULED,
                 'notes' => 'Morning canteen run',
-                'locations' => ['Main Building — Ground Floor — Left Side'],
+                'locations' => ['Main Building — Ground Floor — Left Wing'],
                 'categories' => ['Biodegradable'],
             ],
             [
@@ -69,7 +69,7 @@ class ScheduleSeeder extends Seeder
                 'assignee' => $ben->id,
                 'status' => CollectionSchedule::STATUS_SCHEDULED,
                 'notes' => 'Still pending — shows as overdue',
-                'locations' => ['Main Building — Ground Floor — Left Side'],
+                'locations' => ['Main Building — Ground Floor — Left Wing'],
                 'categories' => ['Biodegradable'],
             ],
             [
@@ -91,7 +91,7 @@ class ScheduleSeeder extends Seeder
                 'assignee' => $ben->id,
                 'status' => CollectionSchedule::STATUS_SCHEDULED,
                 'notes' => 'Covered court — all bins',
-                'locations' => ['Main Building — Ground Floor — Right Side'],
+                'locations' => ['Main Building — Ground Floor — Right Wing'],
                 'categories' => ['Biodegradable', 'Recyclable'],
             ],
             [
@@ -113,7 +113,7 @@ class ScheduleSeeder extends Seeder
                 'assignee' => $cora->id,
                 'status' => CollectionSchedule::STATUS_SCHEDULED,
                 'notes' => 'Admin building — full sweep, all categories',
-                'locations' => ['Main Building — Second Floor — Right Side'],
+                'locations' => ['Main Building — Second Floor — Right Wing'],
                 'categories' => ['Biodegradable', 'Recyclable', 'Non-biodegradable'],
             ],
         ];

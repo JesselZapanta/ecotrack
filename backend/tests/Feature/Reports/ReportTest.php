@@ -30,15 +30,6 @@ beforeEach(function () {
         'is_active' => true,
     ]);
 
-    $this->officeUser = User::create([
-        'name' => 'Office - Education',
-        'username' => 'educ',
-        'email' => 'educ@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
-        'office_id' => $office->id,
-        'is_active' => true,
-    ]);
 
     $this->maintenance = User::create([
         'name' => 'Mang Ben',
@@ -205,38 +196,7 @@ it('validates the report filters', function () {
         ->assertJsonValidationErrors('date_to');
 });
 
-it('scopes office reports to their office location', function () {
-    $report = $this->actingAs($this->officeUser, 'api')
-        ->getJson('/api/reports/waste-summary?date_from=2026-10-01&date_to=2026-10-31&location_id='.$this->canteen->id)
-        ->assertOk()
-        ->json('report');
 
-    expect((float) $report['summary']['total_kg'])->toBe(15.0);
-    expect($report['summary']['records'])->toBe(2);
-    expect($report['filters']['location']['name'])->toBe('Main Building');
-
-    $this->actingAs($this->officeUser, 'api')
-        ->get('/api/reports/waste-summary/pdf?date_from=2026-10-01&date_to=2026-10-31')
-        ->assertOk();
-});
-
-it('returns role-scoped report options', function () {
-    $officeOptions = $this->actingAs($this->officeUser, 'api')
-        ->getJson('/api/reports/options')
-        ->assertOk()
-        ->json();
-
-    expect($officeOptions['locations'])->toHaveCount(1);
-    expect($officeOptions['locations'][0]['name'])->toBe('Main Building');
-    expect($officeOptions['categories'])->toHaveCount(2);
-
-    $adminOptions = $this->actingAs($this->admin, 'api')
-        ->getJson('/api/reports/options')
-        ->assertOk()
-        ->json();
-
-    expect($adminOptions['locations'])->toHaveCount(2);
-});
 
 it('scopes maintenance reports to their own work', function () {
     WasteRecord::create([

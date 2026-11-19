@@ -1,13 +1,13 @@
-# EcoTrack TCGC: Waste Management and Monitoring System
+# TCGC EcoTrack: Waste Management and Monitoring System
 
-> **Working name.** "EcoTrack TCGC" is a proposed name. Replace it everywhere once the final name is chosen.
-> **Source:** the project manuscript ("Waste Management and Monitoring System"). Items marked **(proposed)** are additions that the manuscript does not state. Confirm them with the adviser and the offices before building.
+> **System name.** The system is titled **TCGC EcoTrack**.
+> **Source:** the project manuscript ("Waste Management and Monitoring System"). Items marked **(proposed)** are additions that the manuscript does not state. Confirm them with the adviser and school personnel before building.
 
 ---
 
 ## 1. Overview
 
-EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It replaces manual waste recordkeeping with one place to:
+TCGC EcoTrack is a web application for **Tangub City Global College (TCGC)**. It replaces manual waste recordkeeping with one place to:
 
 - record waste information (location, date, quantity, status),
 - manage garbage collection schedules,
@@ -17,7 +17,7 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 
 **Primary job:** let the college always know where waste is, whether it has been collected, and what is overdue.
 
-**Problem it solves (from the manuscript):** records, schedules and updates are handled manually. Retrieving old records and preparing reports takes time, and offices must ask the administrator for every update.
+**Problem it solves (from the manuscript):** records, schedules and updates are handled manually. Retrieving old records and preparing reports takes time, and maintenance personnel must ask the administrator for every update.
 
 ### Objectives
 
@@ -35,27 +35,27 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 
 | Role | Who | What they do |
 |---|---|---|
-| **Administrator** | Designated college personnel responsible for waste management | Full control: records, schedules, status, reports, user accounts |
-| **Maintenance Personnel** | Janitorial and maintenance staff who do the collecting | See assigned schedules and **update collection status** (proposed) |
-| **Office** | Offices and departments of TCGC | View records, schedules and status that apply to them, **view-only** |
+| **Administrator** | Designated college personnel responsible for waste management | Full control: records, schedules, status, concerns, reports, user accounts, master data, audit log |
+| **Maintenance Personnel** | Janitorial and maintenance staff who do the collecting | See assigned schedules, update collection status, log waste quantities, report and resolve concerns, view scoped reports |
 
-> **Manuscript conflict to resolve.** The manuscript says "only the administrator can log in" and that staff have view-only access. It also needs those staff to see data. This spec gives every role its own login so access can be restricted properly. Maintenance updating status and offices submitting concerns are **proposed** extensions.
+> **Role change.** The earlier spec included an Office role. The system now has two roles only: Administrator and Maintenance Personnel. Maintenance crews report and manage concerns; the administrator keeps oversight of the same concern list.
 
 ### Permission matrix
 
-| Capability | Administrator | Maintenance | Office |
-|---|:---:|:---:|:---:|
-| Log in | Yes | Yes | Yes |
-| Manage user accounts | Yes | No | No |
-| Add / edit / delete waste records | Yes | No | No |
-| View waste records | All | All (proposed) | Own office / locations |
-| Create / edit / delete schedules | Yes | No | No |
-| View schedules | All | Assigned to them | Their locations |
-| Update collection status | Yes | Assigned schedules (proposed) | No |
-| View dashboard | Full | Task-focused | Office summary |
-| Generate and export reports | Yes | No | Own office only (proposed) |
-| Submit a concern, e.g. overflowing bin | Yes | Yes | Yes (proposed) |
-| View audit log | Yes | No | No |
+| Capability | Administrator | Maintenance |
+|---|:---:|:---:|
+| Log in | Yes | Yes |
+| Manage user accounts | Yes | No |
+| Add / edit / delete waste records | Yes | No |
+| View waste records | All | Own logged records |
+| Create / edit / delete schedules | Yes | No |
+| View schedules | All | Assigned to them |
+| Update collection status | Yes | Assigned schedules |
+| View dashboard | Full | Task-focused |
+| Generate and export reports | Yes | Own work |
+| Submit a concern, e.g. overflowing bin | Yes | Yes |
+| Manage concern status | Yes | Yes |
+| View audit log | Yes | No |
 
 ---
 
@@ -65,7 +65,7 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 - Waste recording and monitoring inside the TCGC campus.
 - Collection scheduling and status monitoring.
 - Dashboard summaries and reports.
-- Role-based, view-only access for non-admin users.
+- Role-based access for administrators and maintenance personnel.
 
 **Out of scope (from the manuscript)**
 - Waste management outside school premises.
@@ -95,7 +95,7 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 | M2.4 | **(proposed)** Each record has a waste category: Biodegradable, Recyclable, Residual, Hazardous/Special. |
 | M2.5 | **(proposed)** Quantity is stored in **kilograms**, with an optional remarks field. |
 | M2.6 | Search, filter (date range, location, category, status) and sort the record list. |
-| M2.7 | Non-admin roles see the same list, read-only, limited by their permissions. |
+| M2.7 | Maintenance personnel see the records they logged, read-only, limited by their permissions. |
 
 ### M3. Collection Schedules
 | ID | Requirement |
@@ -105,7 +105,7 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 | M3.3 | Schedules can be one-time or recurring, e.g. every Monday and Thursday (proposed). |
 | M3.4 | Admin edits, reschedules or cancels a schedule. Changes are logged. |
 | M3.5 | Calendar view and list view of schedules. |
-| M3.6 | Offices see upcoming collections for their own locations. |
+| M3.6 | Maintenance personnel see their assigned upcoming collections. |
 
 ### M4. Collection Status Monitoring
 | ID | Requirement |
@@ -121,13 +121,13 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 |---|---|
 | M5.1 | Admin: totals for the selected period, waste by category, collections completed vs missed, overdue items, and the locations producing the most waste. |
 | M5.2 | Maintenance: "My collections today" with status buttons. |
-| M5.3 | Office: its own recent records and next scheduled collection. |
+| M5.3 | Maintenance: assigned route, next stop, missed runs and recent waste logged. |
 | M5.4 | The period filter offers Today, This week, This month and Custom range. |
 
 ### M6. Reports
 | ID | Requirement |
 |---|---|
-| M6.1 | Waste summary by period, location, office and category. |
+| M6.1 | Waste summary by period, location and category. |
 | M6.2 | Collection report: scheduled vs collected vs missed. |
 | M6.3 | Missed and overdue collections report. |
 | M6.4 | Reports can be printed. **(proposed)** CSV and PDF export. |
@@ -154,47 +154,43 @@ EcoTrack TCGC is a web application for **Tangub City Global College (TCGC)**. It
 ## 5. Workflow
 
 ```
- ADMIN                       MAINTENANCE                  OFFICE
-   |                              |                          |
- 1. Log in                        |                          |
-   |                              |                          |
- 2. Record waste ------------------------------------------> (appears in office view)
-   |   (location, date, qty,      |                          |
-   |    category, status=Pending) |                          |
-   |                              |                          |
- 3. Create schedule,              |                          |
-   assign to maintenance -------> 4. Sees task on phone      |
-   |                              |                          |
-   |                           5. Starts: status = In Progress|
-   |                           6. Finishes: status = Collected|
-   |                              |   (or Missed + reason)   |
-   |<-- dashboard updates --------+--------------------------> sees updated status
-   |                                                         |
- 7. Reviews dashboard,                                       |
-    handles Overdue / Missed                                 |
-   |                                                         |
- 8. Generates report                                         |
+ ADMIN                         MAINTENANCE
+   |                              |
+ 1. Log in                        |
+   |                              |
+ 2. Manage master data,           |
+    schedules and reports         |
+   |                              |
+ 3. Create schedule,              |
+    assign to maintenance ------> 4. Sees assigned route
+   |                              |
+   |                           5. Updates status
+   |                              (Collected / Missed / Cancelled)
+   |                           6. Logs quantities on collection
+   |                           7. Reports and resolves concerns
+   |<-- dashboards and badges ----+
+   |                              |
+ 8. Reviews reports and audit log |
 ```
 
 **Step by step**
-1. The admin logs in.
-2. The admin adds waste records. Initial status is **Pending**.
-3. The admin creates a collection schedule for one or more locations and assigns it.
-4. The maintenance personnel log in and see their assigned collections.
-5. When collection begins, they set the status to **In Progress**.
-6. When done, they set it to **Collected**, or **Missed** with a reason. Linked waste records update to Collected.
-7. The system flags anything not collected by the end of its time window as **Overdue**.
-8. Offices log in to see the status of waste records and the next collection for their locations.
-9. The admin reviews dashboard summaries, follows up on missed items, and generates reports.
+1. The administrator logs in.
+2. The administrator manages master data, users, schedules, concerns and reports.
+3. The administrator creates a collection schedule for one or more locations and assigns it to maintenance personnel.
+4. The maintenance personnel log in and see only their assigned collections.
+5. When a collection is finished, they set it to **Collected**, or **Missed** with a required reason, or **Cancelled**.
+6. When marking a collection **Collected**, they can log the quantity per category; the system creates a waste record per category.
+7. Maintenance personnel report concerns and can acknowledge and resolve them with a note; the administrator sees the same list.
+8. Past-due **Scheduled** collections are swept to **Missed** when schedule views are loaded.
+9. Dashboards and badges update; the administrator reviews reports and the audit log.
 
 ### Status lifecycles
 
-**Waste record:** `Pending → Scheduled → Collected` (and `Cancelled`)
+**Waste record:** generated from a completed collection and displayed as a read-only register.
 
-**Collection schedule:** `Scheduled → In Progress → Collected`
-Side paths: `Scheduled → Missed → Rescheduled`, and `Scheduled → Cancelled`.
+**Collection schedule:** `Scheduled → Collected`, `Scheduled → Missed`, or `Scheduled → Cancelled`.
 
-**Concern (proposed):** `Open → Acknowledged → Resolved`
+**Concern:** `Open → Acknowledged → Resolved`. Reopening returns it to `Open` and clears the resolution.
 
 ---
 
@@ -213,7 +209,7 @@ users ──< audit_log
 
 | Table | Key fields |
 |---|---|
-| `users` | id, full_name, email, password_hash, role (`admin` / `maintenance` / `office`), office_id, is_active, created_at |
+| `users` | id, full_name, email, password_hash, role (`admin` / `maintenance`), office_id, is_active, created_at |
 | `offices` | id, name, contact_person |
 | `locations` | id, name, building, floor_or_area, office_id (nullable) |
 | `waste_categories` | id, name, color_code, description |
@@ -242,13 +238,9 @@ users ──< audit_log
 **Maintenance**
 - My Collections (today, upcoming)
 - Collection detail with status buttons
-- Report a Concern
-
-**Office**
-- Office Dashboard
-- Records for my locations
-- Schedules for my locations
-- Report a Concern
+- Concerns (report, acknowledge, resolve)
+- Reports scoped to own work
+- My Account
 
 **Shared:** Login, My Account (change password), Logout.
 
@@ -263,7 +255,7 @@ users ──< audit_log
 | Status update from admin or maintenance | Validate, log history, update linked records | Updated collection status |
 | Records and collection activity | Summarize | Dashboard summaries |
 | Stored data and report filters | Retrieve and organize | Generated reports |
-| View request from office or maintenance | Check role, return permitted data | Viewable waste management information |
+| View request from maintenance | Check role and assignment scope, return permitted data | Viewable waste management information |
 
 ---
 
@@ -302,11 +294,8 @@ users ──< audit_log
 
 ## 11. Open Questions
 
-1. Do offices get **their own logins**, or one shared view per office?
-2. Can maintenance personnel **update status** themselves, or does only the admin?
-3. What is the **unit of quantity**: kg, sacks or bags?
-4. What **waste categories** does TCGC use? Check them against the campus segregation scheme and local government requirements.
-5. Are **concerns** (M7) in scope?
-6. Is the system hosted **on campus** or online?
-7. What data must be **exportable** for compliance or reporting to the school administration?
-8. Who owns the **final system name**?
+1. What is the **unit of quantity**: kg, sacks or bags?
+2. What **waste categories** does TCGC use? Check them against the campus segregation scheme and local government requirements.
+3. Is the system hosted **on campus** or online?
+4. What data must be **exportable** for compliance or reporting to the school administration?
+5. Who owns the **final system name**?

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { apiMessage, createOffice, updateOffice } from "@/admin/offices/api"
 import { OFFICE_TYPES } from "@/admin/offices/types"
 import type { ApiOffice, LocationOption } from "@/admin/offices/types"
@@ -104,35 +104,28 @@ export function OfficeFormDialog({ editing, locations, onClose, onSaved }: Props
             </div>
             <div className="space-y-1.5">
               <Label>Type</Label>
-              <Select
+              <SearchSelect
+                options={OFFICE_TYPES.map((type) => ({ value: type, label: type }))}
                 value={form.type}
                 onValueChange={(value) => setForm({ ...form, type: value })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {OFFICE_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Type"
+                triggerClassName="w-full"
+              />
             </div>
           </div>
 
           <div className="space-y-1.5">
             <Label>Status</Label>
-            <Select value={form.status} onValueChange={(value) => setForm({ ...form, status: value })}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
+            <SearchSelect
+              options={[
+                { value: "Active", label: "Active" },
+                { value: "Inactive", label: "Inactive" },
+              ]}
+              value={form.status}
+              onValueChange={(value) => setForm({ ...form, status: value })}
+              placeholder="Status"
+              triggerClassName="w-full"
+            />
           </div>
 
           <div className="space-y-1.5">
@@ -146,21 +139,16 @@ export function OfficeFormDialog({ editing, locations, onClose, onSaved }: Props
 
           <div className="space-y-1.5">
             <Label>Location</Label>
-            <Select
+            <SearchSelect
+              options={locations.map((location) => ({
+                value: String(location.id),
+                label: location.name,
+              }))}
               value={form.locationId}
               onValueChange={(value) => setForm({ ...form, locationId: value })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose a location" />
-              </SelectTrigger>
-              <SelectContent>
-                {locations.map((location) => (
-                  <SelectItem key={location.id} value={String(location.id)}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder="Choose a location"
+              triggerClassName="w-full"
+            />
           </div>
 
           {error && (

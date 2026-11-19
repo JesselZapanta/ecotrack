@@ -27,7 +27,6 @@ class UpdateUserRequest extends FormRequest
             'role' => ['sometimes', 'required', Rule::in([
                 User::ROLE_ADMIN,
                 User::ROLE_MAINTENANCE,
-                User::ROLE_OFFICE,
             ])],
             'office_id' => ['nullable', 'integer', 'exists:offices,id'],
             'is_active' => ['sometimes', 'boolean'],

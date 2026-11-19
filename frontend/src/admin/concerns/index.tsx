@@ -13,7 +13,7 @@ export default function Concerns() {
       <ConcernsList
         canManage
         emptyTitle="No concerns reported"
-        emptyDescription="When an office reports a problem, it lands here for review."
+        emptyDescription="When maintenance reports a problem, it lands here for review."
       />
     </div>
   )

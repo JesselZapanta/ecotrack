@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "@/lib/api"
-import type { ApiUser, Meta, OfficeOption, UserPayload, UsersQuery } from "./types"
+import type { ApiUser, CreateUserPayload, Meta, OfficeOption, UserPayload, UsersQuery } from "./types"
 
 export async function getUsers(query: UsersQuery): Promise<{ data: ApiUser[]; meta: Meta }> {
   const { data } = await api.get<{ data: ApiUser[]; meta: Meta }>("/users", {
@@ -26,14 +26,27 @@ export async function getOffices(): Promise<OfficeOption[]> {
   return data.data
 }
 
-export async function createUser(payload: UserPayload): Promise<{ user: ApiUser; temporary_password: string }> {
-  const { data } = await api.post<{ user: ApiUser; temporary_password: string }>("/users", payload)
-  return data
+export async function createUser(payload: CreateUserPayload): Promise<ApiUser> {
+  const { data } = await api.post<{ user: ApiUser }>("/users", payload)
+  return data.user
 }
 
 export async function updateUser(id: number, payload: UserPayload): Promise<ApiUser> {
   const { data } = await api.patch<{ user: ApiUser }>(`/users/${id}`, payload)
   return data.user
+}
+
+export type UserPasswordPayload = {
+  password: string
+  password_confirmation: string
+}
+
+export async function updateUserPassword(
+  id: number,
+  payload: UserPasswordPayload
+): Promise<string> {
+  const { data } = await api.patch<{ message: string }>(`/users/${id}/password`, payload)
+  return data.message
 }
 
 export async function setUserStatus(id: number, isActive: boolean): Promise<string> {

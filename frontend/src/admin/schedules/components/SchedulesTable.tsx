@@ -115,7 +115,7 @@ export function SchedulesTable({
 }: Props) {
   const today = new Date().toISOString().slice(0, 10)
   const showActions = canManage || canUpdateStatus
-  const columnCount = 6 + (showLocations ? 1 : 0) + (showActions ? 1 : 0)
+  const columnCount = 5 + (showLocations ? 1 : 0) + (showActions ? 1 : 0)
 
   return (
     <Card className="overflow-hidden" aria-busy={loading}>
@@ -220,16 +220,16 @@ export function SchedulesTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <SortHead label="ID" column="id" currentSort={sort} direction={direction} onSort={onSort} className="pl-5" />
+                {showLocations && <TableHead className="min-w-[240px] pl-5">Locations</TableHead>}
                 <SortHead
                   label="Date"
                   column="scheduled_date"
                   currentSort={sort}
                   direction={direction}
                   onSort={onSort}
+                  className={showLocations ? "" : "pl-5"}
                 />
                 <TableHead>Time window</TableHead>
-                {showLocations && <TableHead>Locations</TableHead>}
                 <TableHead>Categories</TableHead>
                 <TableHead>Assignee</TableHead>
                 <SortHead label="Status" column="status" currentSort={sort} direction={direction} onSort={onSort} />
@@ -256,8 +256,22 @@ export function SchedulesTable({
                             : ""
                       }
                     >
-                      <TableCell className="num pl-5 text-[11.5px] text-muted-ink">{schedule.id}</TableCell>
-                      <TableCell className="num text-[12px]">
+                      {showLocations && (
+                        <TableCell className="min-w-[240px] whitespace-normal pl-5 text-[12px]">
+                          <span className="inline-flex flex-wrap gap-1">
+                            {schedule.locations.map((location) => (
+                              <span
+                                key={location.id}
+                                className="inline-flex max-w-full items-center gap-1 rounded-[5px] border border-line bg-surface-2 px-1.5 py-0.5 text-[10.5px] font-medium break-words whitespace-normal text-ink-2"
+                              >
+                                <MapPin className="size-2.5 shrink-0" />
+                                {location.name}
+                              </span>
+                            ))}
+                          </span>
+                        </TableCell>
+                      )}
+                      <TableCell className={`num text-[12px] ${showLocations ? "" : "pl-5"}`}>
                         <span className="inline-flex items-center gap-1.5">
                           {formatDate(schedule.scheduled_date)}
                           {schedule.scheduled_date === today && (
@@ -278,21 +292,6 @@ export function SchedulesTable({
                           {schedule.window_start}–{schedule.window_end}
                         </span>
                       </TableCell>
-                      {showLocations && (
-                        <TableCell className="max-w-[200px] text-[12px]">
-                          <span className="inline-flex flex-wrap gap-1">
-                            {schedule.locations.map((location) => (
-                              <span
-                                key={location.id}
-                                className="inline-flex items-center gap-1 rounded-[5px] border border-line bg-surface-2 px-1.5 py-0.5 text-[10.5px] font-medium text-ink-2"
-                              >
-                                <MapPin className="size-2.5" />
-                                {location.name}
-                              </span>
-                            ))}
-                          </span>
-                        </TableCell>
-                      )}
                       <TableCell className="max-w-[230px]">
                         <CategoryDots categories={schedule.categories} />
                       </TableCell>

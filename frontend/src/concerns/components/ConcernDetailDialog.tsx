@@ -126,7 +126,6 @@ export function ConcernDetailDialog({
               <p className="truncate text-[12.5px] font-medium text-ink">
                 {concern.reporter?.name ?? "Unknown"}
               </p>
-              <p className="truncate text-[10.5px] text-muted-ink">{concern.office?.name ?? "—"}</p>
             </div>
           </div>
         </div>
@@ -180,7 +179,7 @@ export function ConcernDetailDialog({
         {mode === "resolve" && (
           <div className="space-y-1.5 rounded-[10px] border border-line p-3">
             <Label htmlFor="resolution-note">Resolution note</Label>
-            <p className="text-[11px] text-muted-ink">Explain what was done — the office will see this.</p>
+            <p className="text-[11px] text-muted-ink">Explain what was done — the reporter will see this.</p>
             <Textarea
               id="resolution-note"
               value={note}

@@ -14,11 +14,12 @@ class LocationSeeder extends Seeder
             ['name' => 'Annex Building — Second Floor', 'building' => 'Annex Building', 'floor_or_area' => 'Second Floor'],
             ['name' => 'Senior High School Building — Ground Floor', 'building' => 'Senior High School Building', 'floor_or_area' => 'Ground Floor'],
             ['name' => 'Senior High School Building — Second Floor', 'building' => 'Senior High School Building', 'floor_or_area' => 'Second Floor'],
-            ['name' => 'Main Building — Ground Floor — Left Side', 'building' => 'Main Building', 'floor_or_area' => 'Ground Floor — Left Side'],
-            ['name' => 'Main Building — Ground Floor — Right Side', 'building' => 'Main Building', 'floor_or_area' => 'Ground Floor — Right Side'],
-            ['name' => 'Main Building — Second Floor — Left Side', 'building' => 'Main Building', 'floor_or_area' => 'Second Floor — Left Side'],
-            ['name' => 'Main Building — Second Floor — Right Side', 'building' => 'Main Building', 'floor_or_area' => 'Second Floor — Right Side'],
+            ['name' => 'Main Building — Ground Floor — Left Wing', 'building' => 'Main Building', 'floor_or_area' => 'Ground Floor — Left Wing'],
+            ['name' => 'Main Building — Ground Floor — Right Wing', 'building' => 'Main Building', 'floor_or_area' => 'Ground Floor — Right Wing'],
+            ['name' => 'Main Building — Second Floor — Left Wing', 'building' => 'Main Building', 'floor_or_area' => 'Second Floor — Left Wing'],
+            ['name' => 'Main Building — Second Floor — Right Wing', 'building' => 'Main Building', 'floor_or_area' => 'Second Floor — Right Wing'],
             ['name' => 'Main Building — Third Floor', 'building' => 'Main Building', 'floor_or_area' => 'Third Floor'],
+            ['name' => 'Covered Court', 'building' => 'Covered Court', 'floor_or_area' => 'Open Area'],
         ];
 
         foreach ($locations as $location) {

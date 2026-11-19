@@ -8,7 +8,9 @@ use App\Admin\Schedules\Requests\UpdateScheduleStatusRequest;
 use App\Admin\Schedules\Resources\ScheduleResource;
 use App\Http\Controllers\Controller;
 use App\Models\CollectionSchedule;
+use App\Models\Location;
 use App\Models\User;
+use App\Models\WasteCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -97,6 +99,29 @@ class ScheduleController extends Controller
             ->withQueryString();
 
         return ScheduleResource::collection($schedules);
+    }
+
+    public function options(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $locations = Location::query()->orderBy('name');
+
+        return response()->json([
+            'data' => [
+                'categories' => WasteCategory::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'color_code']),
+                'locations' => $locations->get(['id', 'name']),
+                'assignees' => $user->isAdmin()
+                    ? User::query()
+                        ->where('role', User::ROLE_MAINTENANCE)
+                        ->where('is_active', true)
+                        ->orderBy('name')
+                        ->get(['id', 'name'])
+                    : [],
+            ],
+        ]);
     }
 
     public function show(Request $request, CollectionSchedule $schedule): JsonResponse
@@ -316,20 +341,6 @@ class ScheduleController extends Controller
     {
         if ($user->isMaintenance()) {
             $query->where('assigned_to', $user->id);
-
-            return;
-        }
-
-        if ($user->isOffice()) {
-            $locationId = $user->office?->location_id;
-
-            if (! $locationId) {
-                $query->whereRaw('1 = 0');
-
-                return;
-            }
-
-            $query->whereHas('locations', fn ($builder) => $builder->where('locations.id', $locationId));
         }
     }
 
@@ -348,14 +359,7 @@ class ScheduleController extends Controller
             return;
         }
 
-        $locationId = $user->office?->location_id;
-        $belongs = $locationId
-            ? $schedule->locations()->where('locations.id', $locationId)->exists()
-            : false;
-
-        if (! $belongs) {
-            abort(403, 'Your account can view this page but not change it.');
-        }
+        abort(403, 'Your account cannot view this schedule.');
     }
 
     /**

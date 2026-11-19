@@ -10,6 +10,7 @@ Route::middleware(['auth:api', 'role:admin'])->group(function () {
     Route::get('users', [UserController::class, 'index']);
     Route::post('users', [UserController::class, 'store']);
     Route::patch('users/{user}/status', [UserController::class, 'status']);
+    Route::patch('users/{user}/password', [UserController::class, 'password']);
     Route::patch('users/{user}', [UserController::class, 'update']);
 
     Route::get('offices', [OfficeController::class, 'index']);

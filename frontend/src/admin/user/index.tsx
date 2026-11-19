@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { PageHeader } from "@/components/ecotrack/PageHeader"
 import { UserFormDialog } from "@/admin/user/components/UserFormDialog"
+import { UserPasswordDialog } from "@/admin/user/components/UserPasswordDialog"
 import { UsersTable } from "@/admin/user/components/UsersTable"
 import { UsersToolbar } from "@/admin/user/components/UsersToolbar"
 import { apiMessage, getOffices, getUsers, setUserStatus } from "@/admin/user/api"
@@ -37,6 +38,7 @@ export default function UsersPage() {
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<ApiUser | null>(null)
+  const [passwordUser, setPasswordUser] = useState<ApiUser | null>(null)
   const [confirmUser, setConfirmUser] = useState<ApiUser | null>(null)
 
   useEffect(() => {
@@ -206,6 +208,7 @@ export default function UsersPage() {
           perPage={perPage}
           onSort={toggleSort}
           onEdit={openEdit}
+          onPassword={setPasswordUser}
           onToggle={setConfirmUser}
           onPerPageChange={(value) => {
             setLoading(true)
@@ -232,6 +235,10 @@ export default function UsersPage() {
             setPage(1)
           }}
         />
+      )}
+
+      {passwordUser && (
+        <UserPasswordDialog user={passwordUser} onClose={() => setPasswordUser(null)} />
       )}
 
       <ConfirmDialog

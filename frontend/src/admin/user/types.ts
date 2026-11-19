@@ -37,6 +37,8 @@ export type UserFormValues = {
   email: string
   role: Role
   officeId: string
+  password: string
+  passwordConfirmation: string
 }
 
 export type UserPayload = {
@@ -45,6 +47,11 @@ export type UserPayload = {
   email: string
   role: Role
   office_id: number | null
+}
+
+export type CreateUserPayload = UserPayload & {
+  password: string
+  password_confirmation: string
 }
 
 export type UsersQuery = {

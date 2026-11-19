@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { AlertCircle, ArrowRight, Loader2, TriangleAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PageHeader } from "@/components/ecotrack/PageHeader"
 import { StatTile } from "@/components/ecotrack/StatTile"
@@ -145,22 +145,20 @@ export default function Dashboard() {
         }
         actions={
           <>
-            <Select
+            <SearchSelect
+              options={[
+                { value: "today", label: "Today" },
+                { value: "week", label: "This week" },
+                { value: "month", label: "This month" },
+              ]}
               value={period}
               onValueChange={(value) => {
                 setPeriod(value as Period)
                 setLoading(true)
               }}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This week</SelectItem>
-                <SelectItem value="month">This month</SelectItem>
-              </SelectContent>
-            </Select>
+              placeholder="Period"
+              triggerClassName="w-[140px]"
+            />
             <Button asChild>
               <Link to="/admin/reports">Generate report</Link>
             </Button>

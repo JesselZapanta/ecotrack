@@ -99,3 +99,9 @@ export type FilterOption = {
   name: string
   color_code?: string
 }
+
+export type ScheduleOptions = {
+  categories: FilterOption[]
+  locations: FilterOption[]
+  assignees: FilterOption[]
+}

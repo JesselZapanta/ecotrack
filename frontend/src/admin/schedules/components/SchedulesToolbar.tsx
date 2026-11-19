@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import type { FilterOption } from "@/admin/schedules/types"
 import { Loader2, Search, X } from "lucide-react"
 
@@ -58,18 +58,19 @@ export function SchedulesToolbar({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Select value={status} onValueChange={onStatusChange}>
-            <SelectTrigger className="h-10 w-[calc(50vw-1.25rem)] min-w-[140px] sm:w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="Scheduled">Scheduled</SelectItem>
-              <SelectItem value="Collected">Collected</SelectItem>
-              <SelectItem value="Missed">Missed</SelectItem>
-              <SelectItem value="Cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
+          <SearchSelect
+            options={[
+              { value: "all", label: "All statuses" },
+              { value: "Scheduled", label: "Scheduled" },
+              { value: "Collected", label: "Collected" },
+              { value: "Missed", label: "Missed" },
+              { value: "Cancelled", label: "Cancelled" },
+            ]}
+            value={status}
+            onValueChange={onStatusChange}
+            placeholder="Status"
+            triggerClassName="h-10 w-[calc(50vw-1.25rem)] min-w-[140px] sm:w-[150px]"
+          />
 
           <Input
             type="date"
@@ -84,40 +85,34 @@ export function SchedulesToolbar({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         {canFilterMasterData && (
           <>
-            <Select value={categoryId} onValueChange={onCategoryChange}>
-              <SelectTrigger className="h-10 w-full sm:w-[190px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={String(category.id)}>
-                    <span className="inline-flex items-center gap-2">
-                      <span
-                        className="size-[7px] rounded-full"
-                        style={{ background: category.color_code ?? "#6E756D" }}
-                        aria-hidden
-                      />
-                      {category.name}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchSelect
+              options={[
+                { value: "all", label: "All categories" },
+                ...categories.map((category) => ({
+                  value: String(category.id),
+                  label: category.name,
+                  color: category.color_code,
+                })),
+              ]}
+              value={categoryId}
+              onValueChange={onCategoryChange}
+              placeholder="Category"
+              triggerClassName="h-10 w-full sm:w-[190px]"
+            />
 
-            <Select value={locationId} onValueChange={onLocationChange}>
-              <SelectTrigger className="h-10 w-full sm:w-[190px]">
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All locations</SelectItem>
-                {locations.map((location) => (
-                  <SelectItem key={location.id} value={String(location.id)}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchSelect
+              options={[
+                { value: "all", label: "All locations" },
+                ...locations.map((location) => ({
+                  value: String(location.id),
+                  label: location.name,
+                })),
+              ]}
+              value={locationId}
+              onValueChange={onLocationChange}
+              placeholder="Location"
+              triggerClassName="h-10 w-full sm:w-[190px]"
+            />
           </>
         )}
 

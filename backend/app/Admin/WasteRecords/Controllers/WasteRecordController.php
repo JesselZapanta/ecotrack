@@ -35,13 +35,6 @@ class WasteRecordController extends Controller
 
         if ($user->isMaintenance()) {
             $query->where('created_by', $user->id);
-        } elseif ($user->isOffice()) {
-            $locationId = $user->office?->location_id;
-            if (! $locationId) {
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->where('location_id', $locationId);
-            }
         }
 
         if (! empty($validated['search'])) {
@@ -95,13 +88,6 @@ class WasteRecordController extends Controller
 
         if ($user->isMaintenance() && (int) $wasteRecord->created_by !== (int) $user->id) {
             return response()->json(['message' => 'You can only view your own records.'], 403);
-        }
-
-        if ($user->isOffice()) {
-            $locationId = $user->office?->location_id;
-            if (! $locationId || (int) $wasteRecord->location_id !== (int) $locationId) {
-                return response()->json(['message' => 'You can only view records for your office location.'], 403);
-            }
         }
 
         $wasteRecord->load(['location', 'category', 'creator']);

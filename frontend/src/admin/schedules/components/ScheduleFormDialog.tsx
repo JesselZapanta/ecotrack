@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { Textarea } from "@/components/ui/textarea"
 import { MultiSelectField } from "@/admin/schedules/components/MultiSelectField"
 import { apiMessage, createSchedule, updateSchedule } from "@/admin/schedules/api"
@@ -112,21 +112,19 @@ export function ScheduleFormDialog({ editing, categories, locations, assignees, 
             </div>
             <div className="space-y-1.5">
               <Label>Recurrence</Label>
-              <Select
+              <SearchSelect
+                options={[
+                  { value: "once", label: "One-time" },
+                  { value: "daily", label: "Daily" },
+                  { value: "weekly", label: "Weekly" },
+                ]}
                 value={form.recurrence}
                 onValueChange={(value) =>
                   setForm({ ...form, recurrence: value as "once" | "daily" | "weekly" })
                 }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="once">One-time</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                </SelectContent>
-              </Select>
+                placeholder="Recurrence"
+                triggerClassName="w-full"
+              />
             </div>
           </div>
 
@@ -153,22 +151,21 @@ export function ScheduleFormDialog({ editing, categories, locations, assignees, 
 
           <div className="space-y-1.5">
             <Label>Assigned maintenance</Label>
-            <Select
+            <SearchSelect
+              options={[
+                { value: "none", label: "Unassigned" },
+                ...assignees.map((assignee) => ({
+                  value: String(assignee.id),
+                  label: assignee.name,
+                })),
+              ]}
               value={form.assigneeId || "none"}
-              onValueChange={(value) => setForm({ ...form, assigneeId: value === "none" ? "" : value })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Unassigned" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Unassigned</SelectItem>
-                {assignees.map((assignee) => (
-                  <SelectItem key={assignee.id} value={String(assignee.id)}>
-                    {assignee.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onValueChange={(value) =>
+                setForm({ ...form, assigneeId: value === "none" ? "" : value })
+              }
+              placeholder="Unassigned"
+              triggerClassName="w-full"
+            />
           </div>
 
           <div className="space-y-2">

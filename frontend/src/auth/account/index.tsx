@@ -64,10 +64,8 @@ export default function Account() {
 
   const roleAccess =
     role === "admin"
-      ? "Full control of records, schedules, users and master lists."
-      : role === "maintenance"
-        ? "Assigned collection routes and status updates."
-        : "View-only access to your office's records, schedules and concerns."
+      ? "Full control of records, schedules, concerns, users and master lists."
+      : "Assigned collection routes, status updates, concerns and reports."
 
   const handleProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

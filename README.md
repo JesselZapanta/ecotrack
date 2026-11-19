@@ -1,8 +1,8 @@
-# EcoTrack TCGC — Waste Management and Monitoring System
+# TCGC EcoTrack — Waste Management and Monitoring System
 
 Waste Management and Monitoring System for **Tangub City Global College (TCGC)**. Replaces manual recordkeeping with a single place to record waste, manage collection schedules, monitor status, and generate reports.
 
-> **Working name** `EcoTrack TCGC` — see `SYSTEM.md` §1. Source spec is `SYSTEM.md` (functional) + `DESIGN.md` (visual system).
+> **System name** `TCGC EcoTrack` - see `SYSTEM.md` §1. Source spec is `SYSTEM.md` (functional) + `DESIGN.md` (visual system).
 
 ## Stack
 
@@ -25,9 +25,8 @@ EcoTrack/
 │   │   ├── Users/{Controllers,Requests,Resources}
 │   │   └── Offices/Controllers
 │   ├── app/Auth/{Controllers,Requests,Middleware}
-│   ├── app/Office/          # office-scoped modules (placeholder)
 │   ├── app/Maintenance/     # maintenance-scoped modules (placeholder)
-│   ├── routes/api.php       # requires api/{auth,admin,office,maintenance}.php
+│   ├── routes/api.php       # requires api/{auth,admin,schedules,waste-records,audit,maintenance,concerns,reports,nav}.php
 │   ├── config/jwt.php       # tymon/jwt-auth
 │   ├── database/seeders/{Users,Offices}
 │   ├── tests/Feature/{Auth,Users}
@@ -36,9 +35,8 @@ EcoTrack/
     ├── src/admin/           # layout + dashboard, user, records, schedules,
     │                        # collections, collection-detail, concerns, reports,
     │                        # locations, offices, categories, audit
-    ├── src/office/          # layout + dashboard, records, schedules, reports, concern
-    ├── src/maintenance/     # layout + dashboard, route, schedules, concern
-    ├── src/auth/            # login, account, concern, require-auth
+    ├── src/maintenance/     # layout + dashboard, route, schedules, reports, concern, report-concern
+    ├── src/auth/            # login, account, require-auth
     ├── src/components/      # ui, brand, ecotrack, nav, RoleLayout, RoleModule
     ├── src/lib/             # api, store, mockData
     └── src/index.css        # Fieldwork tokens
@@ -46,9 +44,8 @@ EcoTrack/
 
 ## Roles
 
-- **Administrator** — full control (records, schedules, reports, users, audit log)
-- **Maintenance** — assigned collections, update status `Scheduled → In Progress → Collected/Missed` (mobile-first, 56px targets)
-- **Office** — view-only for own locations
+- **Administrator** — full control (records, schedules, concerns, reports, users, audit log)
+- **Maintenance** — assigned collections, status updates, waste logging and concern reporting/resolution (mobile-first, 56px targets)
 
 Permission matrix and lifecycles in `SYSTEM.md` §2 / §5. Items marked `(proposed)` in SYSTEM.md require adviser sign-off.
 
@@ -74,7 +71,7 @@ Tokens live in `frontend/src/index.css`; `DESIGN.md` is the earlier Harbor Glass
 |---|---|---|---|
 | Administrator | `admin@tcgc.edu.ph` | `admin` | `/admin/dashboard` |
 | Maintenance | `ben@tcgc.edu.ph` | `ben` | `/maintenance/dashboard` |
-| Office | `educ@tcgc.edu.ph` | `educ` | `/office/dashboard` |
+| Maintenance | `cora@tcgc.edu.ph` | `cora` | `/maintenance/dashboard` |
 
 All seed accounts use password **`password`**. Tokens expire after 60 minutes; logout blacklists the token. `GET /api/auth/me` restores the session, `POST /api/auth/refresh` rotates it.
 
@@ -90,7 +87,7 @@ POST /api/auth/login
 | Query | Values |
 |---|---|
 | `search` | matches name, email or username |
-| `role` | `admin` · `maintenance` · `office` |
+| `role` | `admin` · `maintenance` |
 | `status` | `active` · `inactive` |
 | `office_id` | office id |
 | `sort` | `id` · `name` · `email` · `role` · `created_at` (default `id`) |
@@ -98,7 +95,7 @@ POST /api/auth/login
 | `per_page` | 1–100 (default 10) |
 | `page` | page number |
 
-Response: `data[]` + `meta` (`current_page`, `last_page`, `per_page`, `total`, `from`, `to`). `POST /api/users` creates an account and returns a one-time `temporary_password`; `PATCH /api/users/{id}` updates details; `PATCH /api/users/{id}/status` activates or deactivates. All require `auth:api` + `role:admin`. `GET /api/offices` supplies office options.
+Response: `data[]` + `meta` (`current_page`, `last_page`, `per_page`, `total`, `from`, `to`). `POST /api/users` creates an account with an admin-set `password` + `password_confirmation`; `PATCH /api/users/{id}` updates details; `PATCH /api/users/{id}/password` sets a new password; `PATCH /api/users/{id}/status` activates or deactivates. All require `auth:api` + `role:admin`. `GET /api/offices` supplies office options.
 
 ## Categories API (admin)
 
@@ -112,7 +109,7 @@ Response: `data[]` + `meta` (`current_page`, `last_page`, `per_page`, `total`, `
 | `per_page` | 1–100 (default 10) |
 | `page` | page number |
 
-Response: `data[]` (`id`, `name`, `color`/`color_code`, `description`, `created_at`) + `meta`. `POST /api/categories` creates a category; `PATCH /api/categories/{id}` updates it; `DELETE /api/categories/{id}` deletes it. All require `auth:api` + `role:admin`. Seeded with Biodegradable, Recyclable, Residual, Hazardous.
+Response: `data[]` (`id`, `name`, `color`/`color_code`, `description`, `created_at`) + `meta`. `POST /api/categories` creates a category; `PATCH /api/categories/{id}` updates it; `PATCH /api/categories/{id}/status` activates or deactivates it. All require `auth:api` + `role:admin`. Seeded with Biodegradable, Non-biodegradable, Recyclable.
 
 ## Offices API (admin)
 
@@ -126,7 +123,7 @@ Response: `data[]` (`id`, `name`, `color`/`color_code`, `description`, `created_
 | `per_page` | 1–100 (default 10) |
 | `page` | page number |
 
-Response: `data[]` (`id`, `name`, `contact_person`, `location_id`, `location`, `created_at`) + `meta`. `POST /api/offices` creates an office; `PATCH /api/offices/{id}` updates it; `DELETE /api/offices/{id}` deletes it (linked users are unlinked via `nullOnDelete`). All require `auth:api` + `role:admin`. Seeded with Administration, College of Education, College of Business, Student Affairs — each assigned to its location.
+Response: `data[]` (`id`, `name`, `contact_person`, `location_id`, `location`, `created_at`) + `meta`. `POST /api/offices` creates an office; `PATCH /api/offices/{id}` updates it; `PATCH /api/offices/{id}/status` activates or deactivates it (no hard delete). All require `auth:api` + `role:admin`. Seeded with 107 campus spaces across all four types.
 
 ## Locations API (admin)
 
@@ -160,7 +157,7 @@ Response: `data[]` (`id`, `name`, `building`, `floor_or_area`, `offices[]`, `cre
 
 Response: `data[]` (`id`, `scheduled_date`, `window_start`, `window_end`, `recurrence_rule`, `status`, `display_status`, `is_overdue`, `notes`, `assigned_to`, `assignee`, `locations[]`, `categories[]`) + `meta`.
 
-**Scoping:** admins see everything; maintenance sees only schedules assigned to them; office users see only schedules for their office's location. A schedule's `status` is one of `Scheduled`/`Collected`/`Missed`/`Cancelled`.
+**Scoping:** admins see everything; maintenance sees only schedules assigned to them. A schedule's `status` is one of `Scheduled`/`Collected`/`Missed`/`Cancelled`.
 
 | Endpoint | Who | Purpose |
 |---|---|---|
@@ -171,6 +168,19 @@ Response: `data[]` (`id`, `scheduled_date`, `window_start`, `window_end`, `recur
 | `DELETE /api/schedules/{id}` | admin | delete schedule + history |
 
 Seeder: 8 schedules covering today/tomorrow/yesterday, one overdue, one missed, and multi-category routes (up to 3 categories).
+
+## Concerns API (admin + maintenance)
+
+`GET /api/concerns` is scoped by role: **admin** sees every concern; **maintenance** also sees every concern and is the role that reports and resolves them. `GET /api/concerns/locations` returns every active location.
+
+| Endpoint | Who | Purpose |
+|---|---|---|
+| `GET /api/concerns` | admin, maintenance | list with search, status, sort and pagination |
+| `GET /api/concerns/{id}` | admin, maintenance | detail |
+| `POST /api/concerns` | admin, maintenance | report a concern with `location_id`, `description`, optional `photo` |
+| `PATCH /api/concerns/{id}/status` | admin, maintenance | `Open`/`Acknowledged`/`Resolved`; resolution note required when resolving |
+
+Maintenance uses `/maintenance/concerns` and `/maintenance/report-concern`; the administrator sees the same list at `/admin/concerns` for oversight.
 
 
 ## Quick Start
@@ -192,7 +202,7 @@ php artisan test                # Pest (75 tests)
 ```powershell
 cd frontend
 npm install
-copy .env.example .env          # VITE_API_URL=http://localhost:8000/api
+copy .env.example .env          # VITE_API_URL=/api (Vite proxies /api and /storage; set VITE_PROXY_TARGET for another backend port)
 npm run dev                     # http://localhost:5173
 npm run build                   # tsc -b && vite build
 npm run lint

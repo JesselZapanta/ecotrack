@@ -35,50 +35,120 @@ type AuthContextType = {
 export const ROLE_HOME: Record<Role, string> = {
   admin: "/admin/dashboard",
   maintenance: "/maintenance/dashboard",
-  office: "/office/dashboard",
 }
 
 export const ROLE_LABEL: Record<Role, string> = {
   admin: "Administrator",
   maintenance: "Maintenance",
-  office: "Office",
+}
+
+const USER_KEY = "ecotrack_user"
+const USER_AT_KEY = "ecotrack_user_at"
+const USER_TTL = 60_000
+
+function readCachedUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(USER_KEY)
+    return raw ? (JSON.parse(raw) as AuthUser) : null
+  } catch {
+    return null
+  }
+}
+
+function readCachedUserAt() {
+  return Number(localStorage.getItem(USER_AT_KEY) ?? 0)
+}
+
+function tokenIsFresh() {
+  const token = localStorage.getItem(TOKEN_KEY)
+
+  if (!token) return false
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1] ?? ""))
+    return typeof payload.exp !== "number" || payload.exp * 1000 > Date.now()
+  } catch {
+    return true
+  }
+}
+
+function writeCachedUser(user: AuthUser | null) {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+    localStorage.setItem(USER_AT_KEY, String(Date.now()))
+  } else {
+    localStorage.removeItem(USER_KEY)
+    localStorage.removeItem(USER_AT_KEY)
+  }
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+let meRequest: Promise<{ user: AuthUser }> | null = null
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null)
-  const [loading, setLoading] = useState<boolean>(() => Boolean(localStorage.getItem(TOKEN_KEY)))
+  const [user, setUser] = useState<AuthUser | null>(() =>
+    tokenIsFresh() ? readCachedUser() : null
+  )
+  const [loading, setLoading] = useState<boolean>(() =>
+    tokenIsFresh() ? !readCachedUser() : false
+  )
 
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY)
+
     if (!token) {
+      return
+    }
+
+    if (!tokenIsFresh()) {
+      localStorage.removeItem(TOKEN_KEY)
+      writeCachedUser(null)
+      return
+    }
+
+    const cached = readCachedUser()
+    const fresh = cached && Date.now() - readCachedUserAt() < USER_TTL
+
+    if (fresh) {
       return
     }
 
     let cancelled = false
 
-    api
-      .get<{ user: AuthUser }>("/auth/me")
-      .then(({ data }) => {
-        if (!cancelled) setUser(data.user)
-      })
-      .catch(() => {
-        localStorage.removeItem(TOKEN_KEY)
-        if (!cancelled) setUser(null)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+    const loadUser = () => {
+      meRequest ??= api.get<{ user: AuthUser }>("/auth/me").then(({ data }) => data)
+
+      meRequest
+        .then(({ user }) => {
+          if (!cancelled && localStorage.getItem(TOKEN_KEY)) {
+            setUser(user)
+            writeCachedUser(user)
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem(TOKEN_KEY)
+          writeCachedUser(null)
+          if (!cancelled) setUser(null)
+        })
+        .finally(() => {
+          meRequest = null
+          if (!cancelled) setLoading(false)
+        })
+    }
+
+    const timer = window.setTimeout(loadUser, cached ? 500 : 0)
 
     return () => {
       cancelled = true
+      window.clearTimeout(timer)
     }
   }, [])
 
   useEffect(() => {
     const handleUnauthorized = () => {
       localStorage.removeItem(TOKEN_KEY)
+      writeCachedUser(null)
       setUser(null)
     }
 
@@ -94,27 +164,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }>("/auth/login", { login: loginValue, password })
 
     localStorage.setItem(TOKEN_KEY, data.access_token)
+    writeCachedUser(data.user)
     setUser(data.user)
 
     return { user: data.user, redirect: data.redirect }
   }, [])
 
   const logout = useCallback(async () => {
+    const token = localStorage.getItem(TOKEN_KEY)
+
+    localStorage.removeItem(TOKEN_KEY)
+    writeCachedUser(null)
+    setUser(null)
+
+    if (!token) return
+
     try {
-      await api.post("/auth/logout")
+      await api.post("/auth/logout", null, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
     } catch {
       // The token may already be expired or revoked.
-    } finally {
-      localStorage.removeItem(TOKEN_KEY)
-      setUser(null)
     }
   }, [])
 
   const updateUser = useCallback((next: AuthUser) => {
+    writeCachedUser(next)
     setUser(next)
   }, [])
 
-  const role = user?.role ?? "office"
+  const role = user?.role ?? "maintenance"
   const userName = user?.name ?? ""
 
   const value = useMemo(

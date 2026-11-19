@@ -10,7 +10,6 @@ use App\Models\Concern;
 use App\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class ConcernController extends Controller
 {
@@ -34,16 +33,6 @@ class ConcernController extends Controller
             'reporter:id,name,role',
             'resolver:id,name',
         ]);
-
-        if ($user->isOffice()) {
-            $query->where(function ($builder) use ($user) {
-                $builder->where('reported_by', $user->id);
-
-                if ($user->office_id) {
-                    $builder->orWhere('office_id', $user->office_id);
-                }
-            });
-        }
 
         if (! empty($validated['search'])) {
             $term = '%'.$validated['search'].'%';
@@ -82,15 +71,9 @@ class ConcernController extends Controller
 
     public function locations(Request $request): JsonResponse
     {
-        $user = $request->user();
-
         $query = Location::query()
             ->where('is_active', true)
             ->orderBy('name');
-
-        if ($user->isOffice()) {
-            $query->whereKey($user->office?->location_id);
-        }
 
         return response()->json([
             'data' => $query->get(['id', 'name', 'building', 'floor_or_area']),
@@ -102,24 +85,8 @@ class ConcernController extends Controller
         $user = $request->user();
         $data = $request->validated();
 
-        if ($user->isOffice()) {
-            $locationId = $user->office?->location_id;
-
-            if (! $locationId) {
-                throw ValidationException::withMessages([
-                    'location_id' => 'Your office has no assigned location yet. Ask the administrator.',
-                ]);
-            }
-
-            $data['location_id'] = $locationId;
-        } elseif (empty($data['location_id'])) {
-            throw ValidationException::withMessages([
-                'location_id' => 'Choose the location of the concern.',
-            ]);
-        }
-
         $data['reported_by'] = $user->id;
-        $data['office_id'] = $user->office_id;
+        $data['office_id'] = null;
         $data['status'] = Concern::STATUS_OPEN;
 
         if ($request->hasFile('photo')) {
@@ -171,21 +138,10 @@ class ConcernController extends Controller
 
     private function denyAccess(Request $request, Concern $concern): ?JsonResponse
     {
-        $user = $request->user();
-
-        if ($user->isAdmin()) {
+        if ($request->user()->isAdmin() || $request->user()->isMaintenance()) {
             return null;
         }
 
-        if ($user->isOffice()) {
-            $sameOffice = $user->office_id && (int) $concern->office_id === (int) $user->office_id;
-            $ownReport = (int) $concern->reported_by === (int) $user->id;
-
-            if (! $sameOffice && ! $ownReport) {
-                return response()->json(['message' => 'You can only view concerns reported by your office.'], 403);
-            }
-        }
-
-        return null;
+        return response()->json(['message' => 'You cannot view this concern.'], 403);
     }
 }

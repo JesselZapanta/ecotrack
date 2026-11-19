@@ -15,21 +15,9 @@ beforeEach(function () {
     $this->mainBuilding = Location::create(['name' => 'Main Building', 'building' => 'Main Building', 'floor_or_area' => 'Ground Floor']);
     $this->canteen = Location::create(['name' => 'Canteen', 'building' => 'Canteen']);
 
-    $this->educationOffice = Office::create([
-        'name' => 'Institute of Teacher Education',
-        'contact_person' => 'Dean Santos',
-        'location_id' => $this->mainBuilding->id,
-    ]);
-
-    $this->businessOffice = Office::create([
-        'name' => 'Institute of Business',
-        'contact_person' => 'Dean Reyes',
-        'location_id' => $this->canteen->id,
-    ]);
-
-    $this->scienceOffice = Office::create([
-        'name' => 'College of Science',
-        'contact_person' => 'Dean Lim',
+    $this->office = Office::create([
+        'name' => 'PFOM Office',
+        'contact_person' => 'Ms. Cruz',
         'location_id' => $this->mainBuilding->id,
     ]);
 
@@ -39,7 +27,7 @@ beforeEach(function () {
         'email' => 'admin@tcgc.edu.ph',
         'password' => 'password',
         'role' => User::ROLE_ADMIN,
-        'office_id' => $this->educationOffice->id,
+        'office_id' => $this->office->id,
         'is_active' => true,
     ]);
 
@@ -49,36 +37,17 @@ beforeEach(function () {
         'email' => 'ben@tcgc.edu.ph',
         'password' => 'password',
         'role' => User::ROLE_MAINTENANCE,
+        'office_id' => $this->office->id,
         'is_active' => true,
     ]);
 
-    $this->educ = User::create([
-        'name' => 'Office - Education',
-        'username' => 'educ',
-        'email' => 'educ@tcgc.edu.ph',
+    $this->cora = User::create([
+        'name' => 'Ate Cora',
+        'username' => 'cora',
+        'email' => 'cora@tcgc.edu.ph',
         'password' => 'password',
-        'role' => User::ROLE_OFFICE,
-        'office_id' => $this->educationOffice->id,
-        'is_active' => true,
-    ]);
-
-    $this->business = User::create([
-        'name' => 'Office - Business',
-        'username' => 'business',
-        'email' => 'business@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
-        'office_id' => $this->businessOffice->id,
-        'is_active' => true,
-    ]);
-
-    $this->science = User::create([
-        'name' => 'Office - Science',
-        'username' => 'science',
-        'email' => 'science@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
-        'office_id' => $this->scienceOffice->id,
+        'role' => User::ROLE_MAINTENANCE,
+        'office_id' => $this->office->id,
         'is_active' => true,
     ]);
 });
@@ -87,47 +56,36 @@ function makeConcern(int $locationId, int $reporterId, array $overrides = []): C
 {
     return Concern::create(array_merge([
         'location_id' => $locationId,
-        'office_id' => User::whereKey($reporterId)->value('office_id'),
+        'office_id' => null,
         'reported_by' => $reporterId,
         'description' => 'Overflowing bin at the entrance.',
         'status' => Concern::STATUS_OPEN,
     ], $overrides));
 }
 
-it('lets an office report a concern for its own location', function () {
-    $response = $this->actingAs($this->educ, 'api')
+it('lets maintenance report a concern for a selected location', function () {
+    $response = $this->actingAs($this->ben, 'api')
         ->postJson('/api/concerns', [
             'location_id' => $this->canteen->id,
-            'description' => 'Overflowing bin near the main entrance.',
+            'description' => 'Overflowing bin near the canteen entrance.',
         ]);
 
     $response->assertCreated()
         ->assertJsonPath('concern.status', Concern::STATUS_OPEN)
-        ->assertJsonPath('concern.location.name', 'Main Building')
-        ->assertJsonPath('concern.reporter.name', 'Office - Education');
+        ->assertJsonPath('concern.location.name', 'Canteen')
+        ->assertJsonPath('concern.reporter.name', 'Mang Ben');
 
-    expect(Concern::firstOrFail()->location_id)->toBe($this->mainBuilding->id);
-    expect(Concern::firstOrFail()->office_id)->toBe($this->educationOffice->id);
-});
-
-it('rejects a concern when an office has no assigned location', function () {
-    $this->educ->update(['office_id' => null]);
-
-    $this->actingAs($this->educ, 'api')
-        ->postJson('/api/concerns', [
-            'description' => 'Overflowing bin near the main entrance.',
-        ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('location_id');
+    expect(Concern::firstOrFail()->location_id)->toBe($this->canteen->id);
+    expect(Concern::firstOrFail()->office_id)->toBeNull();
 });
 
 it('validates the description and location', function () {
-    $this->actingAs($this->admin, 'api')
-        ->postJson('/api/concerns', ['description' => 'short'])
+    $this->actingAs($this->ben, 'api')
+        ->postJson('/api/concerns', ['location_id' => $this->mainBuilding->id, 'description' => 'short'])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('description');
 
-    $this->actingAs($this->admin, 'api')
+    $this->actingAs($this->ben, 'api')
         ->postJson('/api/concerns', ['description' => 'A long enough description of the problem.'])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('location_id');
@@ -136,8 +94,9 @@ it('validates the description and location', function () {
 it('stores an optional photo on the public disk', function () {
     Storage::fake('public');
 
-    $response = $this->actingAs($this->educ, 'api')
+    $response = $this->actingAs($this->ben, 'api')
         ->post('/api/concerns', [
+            'location_id' => $this->mainBuilding->id,
             'description' => 'Overflowing bin with a photo attached.',
             'photo' => UploadedFile::fake()->create('bin.jpg', 200, 'image/jpeg'),
         ]);
@@ -151,8 +110,8 @@ it('stores an optional photo on the public disk', function () {
 });
 
 it('lists every concern for the admin with status filters', function () {
-    makeConcern($this->mainBuilding->id, $this->educ->id);
-    makeConcern($this->canteen->id, $this->business->id, [
+    makeConcern($this->mainBuilding->id, $this->ben->id);
+    makeConcern($this->canteen->id, $this->cora->id, [
         'status' => Concern::STATUS_RESOLVED,
         'description' => 'Mixed waste at the canteen.',
     ]);
@@ -172,7 +131,6 @@ it('lists every concern for the admin with status filters', function () {
                 'resolved_by',
                 'created_at',
                 'location' => ['id', 'name', 'building', 'floor_or_area'],
-                'office' => ['id', 'name'],
                 'reporter' => ['id', 'name', 'role'],
             ]],
             'meta' => ['current_page', 'last_page', 'per_page', 'total', 'from', 'to'],
@@ -188,26 +146,10 @@ it('lists every concern for the admin with status filters', function () {
         ->assertJsonPath('data.0.status', Concern::STATUS_RESOLVED);
 });
 
-it('scopes the office list to its own office', function () {
-    makeConcern($this->mainBuilding->id, $this->educ->id);
-    makeConcern($this->mainBuilding->id, $this->science->id, [
-        'description' => 'Chairs blocking the collection point.',
-    ]);
-    makeConcern($this->canteen->id, $this->business->id, [
-        'description' => 'Mixed waste at the canteen.',
-    ]);
-
-    $response = $this->actingAs($this->educ, 'api')
-        ->getJson('/api/concerns');
-
-    $response->assertOk()->assertJsonPath('meta.total', 1);
-    expect($response->json('data.0.reporter.name'))->toBe('Office - Education');
-});
-
 it('lets maintenance users see all concerns', function () {
-    makeConcern($this->mainBuilding->id, $this->educ->id);
-    makeConcern($this->mainBuilding->id, $this->ben->id, [
-        'description' => 'Broken wheel on the green bin.',
+    makeConcern($this->mainBuilding->id, $this->ben->id);
+    makeConcern($this->canteen->id, $this->cora->id, [
+        'description' => 'Chairs blocking the collection point.',
     ]);
 
     $response = $this->actingAs($this->ben, 'api')
@@ -215,12 +157,12 @@ it('lets maintenance users see all concerns', function () {
 
     $response->assertOk()->assertJsonPath('meta.total', 2);
     expect(collect($response->json('data'))->pluck('reporter.name')->all())
-        ->toContain('Office - Education')
-        ->toContain('Mang Ben');
+        ->toContain('Mang Ben')
+        ->toContain('Ate Cora');
 });
 
 it('lets the admin acknowledge and resolve a concern', function () {
-    $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
+    $concern = makeConcern($this->mainBuilding->id, $this->ben->id);
 
     $this->actingAs($this->admin, 'api')
         ->patchJson("/api/concerns/{$concern->id}/status", ['status' => Concern::STATUS_ACKNOWLEDGED])
@@ -250,7 +192,7 @@ it('lets the admin acknowledge and resolve a concern', function () {
 });
 
 it('requires a resolution note when resolving', function () {
-    $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
+    $concern = makeConcern($this->mainBuilding->id, $this->ben->id);
 
     $this->actingAs($this->admin, 'api')
         ->patchJson("/api/concerns/{$concern->id}/status", ['status' => Concern::STATUS_RESOLVED])
@@ -261,7 +203,7 @@ it('requires a resolution note when resolving', function () {
 });
 
 it('clears the resolution when a concern is reopened', function () {
-    $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
+    $concern = makeConcern($this->mainBuilding->id, $this->ben->id);
 
     $this->actingAs($this->admin, 'api')
         ->patchJson("/api/concerns/{$concern->id}/status", [
@@ -281,7 +223,7 @@ it('clears the resolution when a concern is reopened', function () {
 });
 
 it('lets maintenance update concern status', function () {
-    $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
+    $concern = makeConcern($this->mainBuilding->id, $this->cora->id);
 
     $this->actingAs($this->ben, 'api')
         ->patchJson("/api/concerns/{$concern->id}/status", ['status' => Concern::STATUS_ACKNOWLEDGED])
@@ -302,42 +244,27 @@ it('lets maintenance update concern status', function () {
     expect($fresh->resolution_note)->toBe('Crew cleared the collection point.');
 });
 
-it('rejects status changes from office users', function () {
-    $concern = makeConcern($this->mainBuilding->id, $this->educ->id);
-
-    $this->actingAs($this->educ, 'api')
-        ->patchJson("/api/concerns/{$concern->id}/status", [
-            'status' => Concern::STATUS_RESOLVED,
-            'resolution_note' => 'Office cannot resolve.',
-        ])
-        ->assertForbidden();
-});
-
-it('restricts concern access to the right scope', function () {
-    $concern = makeConcern($this->mainBuilding->id, $this->science->id, [
+it('lets maintenance view any concern', function () {
+    $concern = makeConcern($this->mainBuilding->id, $this->cora->id, [
         'description' => 'Chairs blocking the collection point.',
     ]);
 
-    $this->actingAs($this->educ, 'api')
-        ->getJson("/api/concerns/{$concern->id}")
-        ->assertForbidden();
-
     $this->actingAs($this->ben, 'api')
         ->getJson("/api/concerns/{$concern->id}")
-        ->assertOk();
+        ->assertOk()
+        ->assertJsonPath('concern.reporter.name', 'Ate Cora');
 
     $this->actingAs($this->admin, 'api')
         ->getJson("/api/concerns/{$concern->id}")
         ->assertOk();
 });
 
-it('returns only the office location in the location options', function () {
-    $response = $this->actingAs($this->educ, 'api')
+it('returns every active location in the location options', function () {
+    $response = $this->actingAs($this->ben, 'api')
         ->getJson('/api/concerns/locations');
 
     $response->assertOk();
-    expect($response->json('data'))->toHaveCount(1);
-    expect($response->json('data.0.name'))->toBe('Main Building');
+    expect($response->json('data'))->toHaveCount(2);
 
     $adminResponse = $this->actingAs($this->admin, 'api')
         ->getJson('/api/concerns/locations');

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PageHeader } from "@/components/ecotrack/PageHeader"
 import { EmptyState } from "@/components/ecotrack/EmptyState"
@@ -127,28 +127,34 @@ export default function Records() {
           />
         </div>
         <div className="flex gap-2">
-          <Select value={category} onValueChange={(v) => { setCategory(v); setLoading(true); setPage(1) }}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {categories.map((c) => (
-                <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={locationId} onValueChange={(v) => { setLocationId(v); setLoading(true); setPage(1) }}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Location" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All locations</SelectItem>
-              {locations.map((l) => (
-                <SelectItem key={l.id} value={String(l.id)}>{l.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchSelect
+            options={[
+              { value: "all", label: "All categories" },
+              ...categories.map((c) => ({ value: String(c.id), label: c.name })),
+            ]}
+            value={category}
+            onValueChange={(value) => {
+              setCategory(value)
+              setLoading(true)
+              setPage(1)
+            }}
+            placeholder="Category"
+            triggerClassName="w-[150px]"
+          />
+          <SearchSelect
+            options={[
+              { value: "all", label: "All locations" },
+              ...locations.map((l) => ({ value: String(l.id), label: l.name })),
+            ]}
+            value={locationId}
+            onValueChange={(value) => {
+              setLocationId(value)
+              setLoading(true)
+              setPage(1)
+            }}
+            placeholder="Location"
+            triggerClassName="w-[150px]"
+          />
         </div>
       </div>
 
@@ -180,9 +186,9 @@ export default function Records() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-5 cursor-pointer" onClick={() => toggleSort("id")}>ID</TableHead>
+                  <TableHead className="pl-5">Location</TableHead>
                   <TableHead className="cursor-pointer" onClick={() => toggleSort("date")}>Date</TableHead>
-                  <TableHead>Location</TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("id")}>ID</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead className="text-right cursor-pointer" onClick={() => toggleSort("quantity_kg")}>Quantity</TableHead>
                 </TableRow>
@@ -190,12 +196,12 @@ export default function Records() {
               <TableBody>
                 {records.map((record) => (
                   <TableRow key={record.id}>
-                    <TableCell className="num pl-5 text-[11.5px] text-muted-ink">{record.id}</TableCell>
-                    <TableCell className="num text-[12px]">{record.date}</TableCell>
-                    <TableCell>
+                    <TableCell className="pl-5">
                       <p className="text-[13px] font-medium">{record.location?.name}</p>
                       <p className="text-[11px] text-muted-ink">{record.location?.building}</p>
                     </TableCell>
+                    <TableCell className="num text-[12px]">{record.date}</TableCell>
+                    <TableCell className="num text-[11.5px] text-muted-ink">{record.id}</TableCell>
                     <TableCell>
                       {record.category && (
                         <span className="inline-flex items-center gap-1.5 text-[12px]">

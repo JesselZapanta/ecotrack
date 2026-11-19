@@ -20,8 +20,6 @@ class User extends Authenticatable implements JWTSubject
 
     public const ROLE_MAINTENANCE = 'maintenance';
 
-    public const ROLE_OFFICE = 'office';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -87,17 +85,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->role === self::ROLE_MAINTENANCE;
     }
 
-    public function isOffice(): bool
-    {
-        return $this->role === self::ROLE_OFFICE;
-    }
-
     public function homePath(): string
     {
         return match ($this->role) {
             self::ROLE_ADMIN => '/admin/dashboard',
             self::ROLE_MAINTENANCE => '/maintenance/dashboard',
-            self::ROLE_OFFICE => '/office/dashboard',
             default => '/login',
         };
     }

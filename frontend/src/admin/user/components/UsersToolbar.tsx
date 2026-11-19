@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { OfficeCombobox } from "@/components/OfficeCombobox"
+import { SearchSelect } from "@/components/SearchSelect"
 import type { OfficeOption } from "@/admin/user/types"
 import { Loader2, Search } from "lucide-react"
 
@@ -48,43 +49,39 @@ export function UsersToolbar({
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-2 lg:flex">
-        <Select value={role} onValueChange={onRoleChange}>
-          <SelectTrigger className="w-full lg:w-[145px]">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All roles</SelectItem>
-            <SelectItem value="admin">Administrator</SelectItem>
-            <SelectItem value="maintenance">Maintenance</SelectItem>
-            <SelectItem value="office">Office</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:flex">
+        <SearchSelect
+          options={[
+            { value: "all", label: "All roles" },
+            { value: "admin", label: "Administrator" },
+            { value: "maintenance", label: "Maintenance" },
+          ]}
+          value={role}
+          onValueChange={onRoleChange}
+          placeholder="Role"
+          triggerClassName="w-full sm:h-9 lg:w-[145px]"
+        />
 
-        <Select value={status} onValueChange={onStatusChange}>
-          <SelectTrigger className="w-full lg:w-[130px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-          </SelectContent>
-        </Select>
+        <SearchSelect
+          options={[
+            { value: "all", label: "All status" },
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
+          value={status}
+          onValueChange={onStatusChange}
+          placeholder="Status"
+          triggerClassName="w-full sm:h-9 lg:w-[130px]"
+        />
 
-        <Select value={office} onValueChange={onOfficeChange}>
-          <SelectTrigger className="w-full lg:w-[170px]">
-            <SelectValue placeholder="Office" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All offices</SelectItem>
-            {offices.map((item) => (
-              <SelectItem key={item.id} value={String(item.id)}>
-                {item.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <OfficeCombobox
+          offices={offices}
+          value={office}
+          onChange={onOfficeChange}
+          emptyValue="all"
+          emptyLabel="All offices"
+          triggerClassName="sm:h-9 lg:w-[200px]"
+        />
       </div>
 
       {filtersActive && (

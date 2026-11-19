@@ -4,12 +4,12 @@ namespace App\Admin\Users\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Admin\Users\Requests\StoreUserRequest;
+use App\Admin\Users\Requests\UpdateUserPasswordRequest;
 use App\Admin\Users\Requests\UpdateUserRequest;
 use App\Admin\Users\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'role' => ['nullable', 'in:admin,maintenance,office'],
+            'role' => ['nullable', 'in:admin,maintenance'],
             'status' => ['nullable', 'in:active,inactive'],
             'office_id' => ['nullable', 'integer', 'exists:offices,id'],
             'sort' => ['nullable', 'in:id,name,email,role,created_at'],
@@ -65,13 +65,12 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $password = $data['password'] ?? Str::password(12, symbols: false);
 
         $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'] ?? null,
             'email' => $data['email'],
-            'password' => $password,
+            'password' => $data['password'],
             'role' => $data['role'],
             'office_id' => $data['office_id'] ?? null,
             'is_active' => $data['is_active'] ?? true,
@@ -80,13 +79,22 @@ class UserController extends Controller
         return response()->json([
             'message' => 'User created.',
             'user' => new UserResource($user->load('office.location')),
-            'temporary_password' => $password,
         ], 201);
     }
 
-    public function update(UpdateUserRequest $request, User $user): JsonResponse
+    public function password(UpdateUserPasswordRequest $request, User $user): JsonResponse
     {
-        $data = $request->validated();
+        $user->update([
+            'password' => $request->validated('password'),
+        ]);
+
+        return response()->json([
+            'message' => 'Password updated.',
+        ]);
+    }
+
+    public function update(UpdateUserRequest $request, User $user): JsonResponse
+    {        $data = $request->validated();
 
         if ($request->user()->id === $user->id) {
             if (array_key_exists('is_active', $data) && ! $data['is_active']) {

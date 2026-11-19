@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('schedules', [ScheduleController::class, 'index']);
+    Route::get('schedules/options', [ScheduleController::class, 'options']);
     Route::post('schedules/sweep', [ScheduleController::class, 'sweep']);
     Route::get('schedules/{schedule}', [ScheduleController::class, 'show']);
     Route::patch('schedules/{schedule}/status', [ScheduleController::class, 'status']);

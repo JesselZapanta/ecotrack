@@ -6,25 +6,20 @@ import LoginPage from "@/auth/login"
 import LandingPage from "@/landing"
 import AdminDashboardPage from "@/admin/dashboard"
 import MaintenanceDashboardPage from "@/maintenance/dashboard"
-import OfficeDashboardPage from "@/office/dashboard"
 import AdminRecordsPage from "@/admin/records"
-import OfficeRecordsPage from "@/office/records"
 import AdminSchedulesPage from "@/admin/schedules"
-import OfficeSchedulesPage from "@/office/schedules"
-import OfficeConcernsPage from "@/office/concerns"
 import MaintenanceSchedulesPage from "@/maintenance/schedules"
 import MaintenanceReportsPage from "@/maintenance/reports"
 import MaintenanceConcernsPage from "@/maintenance/concerns"
+import ReportConcernPage from "@/maintenance/report-concern"
 import ConcernsPage from "@/admin/concerns"
 import AdminReportsPage from "@/admin/reports"
-import OfficeReportsPage from "@/office/reports"
 import LocationsPage from "@/admin/locations"
 import OfficesPage from "@/admin/offices"
 import CategoriesPage from "@/admin/categories"
 import UsersPage from "@/admin/user"
 import AuditLogPage from "@/admin/audit"
 import AccountPage from "@/auth/account"
-import ReportConcernPage from "@/auth/concern"
 import { Toaster } from "@/components/ui/sonner"
 
 export default function App() {
@@ -54,22 +49,13 @@ export default function App() {
                 <Route path="admin/account" element={<AccountPage />} />
               </Route>
 
-              <Route element={<RoleRoute role="office" />}>
-                <Route path="office/dashboard" element={<OfficeDashboardPage />} />
-                <Route path="office/records" element={<OfficeRecordsPage />} />
-                <Route path="office/schedules" element={<OfficeSchedulesPage />} />
-                <Route path="office/concerns" element={<OfficeConcernsPage />} />
-                <Route path="office/reports" element={<OfficeReportsPage />} />
-                <Route path="office/report-concern" element={<ReportConcernPage />} />
-                <Route path="office/account" element={<AccountPage />} />
-              </Route>
-
               <Route element={<RoleRoute role="maintenance" />}>
                 <Route path="maintenance/dashboard" element={<MaintenanceDashboardPage />} />
                 <Route path="maintenance/my-collections" element={<Navigate to="/maintenance/dashboard" replace />} />
                 <Route path="maintenance/schedules" element={<MaintenanceSchedulesPage />} />
                 <Route path="maintenance/reports" element={<MaintenanceReportsPage />} />
                 <Route path="maintenance/concerns" element={<MaintenanceConcernsPage />} />
+                <Route path="maintenance/report-concern" element={<ReportConcernPage />} />
                 <Route path="maintenance/account" element={<AccountPage />} />
               </Route>
 

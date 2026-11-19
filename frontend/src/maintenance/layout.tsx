@@ -1,8 +1,9 @@
 import { useState } from "react"
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { useAuth, ROLE_LABEL } from "@/lib/store"
 import { BrandMark, BrandName } from "@/components/brand/Logo"
 import { maintenanceNav } from "@/components/nav"
+import { SideNavLinks } from "@/components/SideNavLinks"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { LogOut, Menu } from "lucide-react"
@@ -37,32 +38,7 @@ export function MaintenanceLayout() {
         <p className="px-2.5 pt-2 pb-2 text-[9.5px] font-semibold tracking-[0.12em] text-sidebar-muted uppercase">
           Field work
         </p>
-        <nav className="space-y-0.5">
-          {maintenanceNav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/maintenance/dashboard"}
-              className={({ isActive }) =>
-                `relative flex min-h-11 items-center gap-2.5 rounded-[7px] px-2.5 py-2 text-[12.5px] font-medium transition-colors md:min-h-0 ${
-                  isActive
-                    ? "bg-sidebar-2 text-white"
-                    : "text-sidebar-text hover:bg-white/5 hover:text-white"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <span className="absolute top-1/2 left-0 h-3.5 w-[2px] -translate-y-1/2 rounded-full bg-lime" />
-                  )}
-                  <span className={isActive ? "text-white" : "text-sidebar-muted"}>{item.icon}</span>
-                  <span className="truncate">{item.label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+        <SideNavLinks items={maintenanceNav} variant="dark-touch" />
       </div>
 
       <div className="border-t border-white/10 p-2.5">

@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { OfficeCombobox } from "@/components/OfficeCombobox"
+import { SearchSelect } from "@/components/SearchSelect"
 import { apiMessage, createUser, updateUser } from "@/admin/user/api"
 import type { ApiUser, OfficeOption } from "@/admin/user/types"
 import type { Role } from "@/lib/mockData"
@@ -22,16 +23,35 @@ export function UserFormDialog({ editing, offices, onClose, onSaved }: Props) {
     name: editing?.name ?? "",
     username: editing?.username ?? "",
     email: editing?.email ?? "",
-    role: (editing?.role ?? "office") as Role,
+    role: (editing?.role ?? "maintenance") as Role,
     officeId: editing?.office_id ? String(editing.office_id) : "",
+    password: "",
+    passwordConfirmation: "",
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const officeOptions =
+    editing?.office && !offices.some((office) => office.id === editing.office?.id)
+      ? [...offices, { id: editing.office.id, name: editing.office.name }]
+      : offices
 
   const save = async () => {
     if (!form.name.trim() || !form.email.trim()) {
       setError("Enter a name and email.")
       return
+    }
+
+    if (!editing) {
+      if (form.password.length < 8) {
+        setError("Use at least 8 characters for the password.")
+        return
+      }
+
+      if (form.password !== form.passwordConfirmation) {
+        setError("The passwords do not match.")
+        return
+      }
     }
 
     setSaving(true)
@@ -50,8 +70,12 @@ export function UserFormDialog({ editing, offices, onClose, onSaved }: Props) {
         await updateUser(editing.id, payload)
         toast.success("User updated.")
       } else {
-        const { temporary_password } = await createUser(payload)
-        toast.success(`User created. Temporary password: ${temporary_password}`, { duration: 12000 })
+        await createUser({
+          ...payload,
+          password: form.password,
+          password_confirmation: form.passwordConfirmation,
+        })
+        toast.success("User created.")
       }
 
       onSaved()
@@ -73,7 +97,7 @@ export function UserFormDialog({ editing, offices, onClose, onSaved }: Props) {
           <DialogDescription>
             {editing
               ? "Update the account details. The password is unchanged."
-              : "A temporary password is generated and shown once after saving."}
+              : "Set the account password — it must be at least 8 characters."}
           </DialogDescription>
         </DialogHeader>
 
@@ -105,37 +129,53 @@ export function UserFormDialog({ editing, offices, onClose, onSaved }: Props) {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Role</Label>
-              <Select value={form.role} onValueChange={(value) => setForm({ ...form, role: value as Role })}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Administrator</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                  <SelectItem value="office">Office</SelectItem>
-                </SelectContent>
-              </Select>
+              <SearchSelect
+                options={[
+                  { value: "admin", label: "Administrator" },
+                  { value: "maintenance", label: "Maintenance" },
+                ]}
+                value={form.role}
+                onValueChange={(value) => setForm({ ...form, role: value as Role })}
+                placeholder="Role"
+                triggerClassName="w-full"
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Office</Label>
-              <Select
-                value={form.officeId || "none"}
-                onValueChange={(value) => setForm({ ...form, officeId: value === "none" ? "" : value })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No office</SelectItem>
-                  {offices.map((office) => (
-                    <SelectItem key={office.id} value={String(office.id)}>
-                      {office.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <OfficeCombobox
+                offices={officeOptions}
+                value={form.officeId}
+                onChange={(value) => setForm({ ...form, officeId: value })}
+              />
             </div>
           </div>
+
+          {!editing && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  value={form.password}
+                  onChange={(event) => setForm({ ...form, password: event.target.value })}
+                  autoComplete="new-password"
+                  placeholder="At least 8 characters"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Confirm password</Label>
+                <Input
+                  type="password"
+                  value={form.passwordConfirmation}
+                  onChange={(event) =>
+                    setForm({ ...form, passwordConfirmation: event.target.value })
+                  }
+                  autoComplete="new-password"
+                  placeholder="Re-enter the password"
+                />
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="flex items-start gap-2 rounded-[8px] border border-alarm/20 bg-alarm-soft px-3 py-2.5">

@@ -1,4 +1,4 @@
-# EcoTrack TCGC Design System — Modern
+# TCGC EcoTrack Design System - Modern
 
 > **Historical.** The shipped UI now follows the **Fieldwork** direction (warm paper, deep pine, flat cards, dark sidebar, Schibsted Grotesk + Manrope + JetBrains Mono). Tokens live in `frontend/src/index.css`; the sections below are kept as the earlier Harbor Glass exploration.
 
@@ -500,21 +500,20 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0
 
 ## 15. Logo
 
-**Source:** `ecotrack logo/` at repo root. **Served from:** `frontend/public/brand/`.
+**Source:** the official Tangub City Global College seal, supplied by the college. **Served from:** `frontend/public/brand/`.
 
 | Asset | Use |
 |---|---|
-| `logo-icon.svg` | App mark — nav, auth, favicon |
-| `logo-horizontal.svg` | Lockup with wordmark — login, print header, external docs |
+| `tcgc-logo.png` | App mark and lockup — nav, auth, landing, footer |
 | `logo-app-icon-512.png` | App icon / `apple-touch-icon` |
-| `favicon-32.png` | Browser tab fallback |
+| `favicon-32.png` | Browser tab icon |
 
-The mark is a waste bin with the four lid colors on its lid, a bay-blue fill and a check — it is the design system in one shape.
+The mark is the official TCGC seal: the flame, globe, book, laurel and campus landscape. It anchors the system to the institution.
 
 **Rules**
-- The four lid segments are fixed: green, yellow, black, orange, in that order. Never reorder, recolor or merge them.
-- Minimum sizes: mark 24 px; horizontal lockup 96 px wide.
-- Clear space = half the mark's width on all sides.
-- On dark backgrounds, place the mark on a white tile (or the white lockup card). Never put the dark wordmark directly on `--bay`.
-- Don't stretch, rotate, add effects to the artwork, or place it on a lid-color background.
+- Keep the seal's proportions, colors and detail. Never recolor, crop into the laurel, or redraw it.
+- Minimum sizes: mark 28 px; horizontal lockup 140 px wide.
+- Clear space = one quarter of the mark's width on all sides.
+- On dark backgrounds the seal's white field keeps it legible; do not invert or place it on a lid-color background.
+- Don't stretch, rotate, or add effects to the artwork.
 - In code use `BrandMark`, `BrandLockup`, `BrandName` from `src/components/brand/Logo.tsx`; do not re-import the image files ad hoc.

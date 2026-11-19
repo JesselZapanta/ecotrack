@@ -16,22 +16,22 @@ class ConcernSeeder extends Seeder
 
         $concerns = [
             [
-                'location' => 'Main Building — Ground Floor — Left Side',
-                'reporter' => 'educ@tcgc.edu.ph',
+                'location' => 'Main Building — Ground Floor — Left Wing',
+                'reporter' => 'ben@tcgc.edu.ph',
                 'status' => Concern::STATUS_OPEN,
                 'description' => 'Overflowing bin at the entrance — the lid no longer closes and waste is spilling onto the walkway.',
                 'created_at' => now()->subDays(2),
             ],
             [
-                'location' => 'Main Building — Ground Floor — Left Side',
-                'reporter' => 'business@tcgc.edu.ph',
+                'location' => 'Main Building — Ground Floor — Left Wing',
+                'reporter' => 'cora@tcgc.edu.ph',
                 'status' => Concern::STATUS_ACKNOWLEDGED,
                 'description' => 'Sacks of residual waste were left beside the collection point overnight instead of inside the bin.',
                 'created_at' => now()->subDays(3),
             ],
             [
-                'location' => 'Main Building — Ground Floor — Left Side',
-                'reporter' => 'educ@tcgc.edu.ph',
+                'location' => 'Main Building — Ground Floor — Left Wing',
+                'reporter' => 'ben@tcgc.edu.ph',
                 'status' => Concern::STATUS_RESOLVED,
                 'description' => 'Missed pickup last Friday; the bin was full and starting to smell.',
                 'resolution_note' => 'Crew collected the backlog the next morning; the bin was emptied and washed.',
@@ -55,8 +55,8 @@ class ConcernSeeder extends Seeder
                 'resolved_at' => now()->subDays(7),
             ],
             [
-                'location' => 'Main Building — Second Floor — Right Side',
-                'reporter' => 'business@tcgc.edu.ph',
+                'location' => 'Main Building — Second Floor — Right Wing',
+                'reporter' => 'cora@tcgc.edu.ph',
                 'status' => Concern::STATUS_OPEN,
                 'description' => 'Collection point is blocked by stacked chairs, so the crew cannot reach the bins.',
                 'created_at' => now()->subHours(4),
@@ -68,7 +68,7 @@ class ConcernSeeder extends Seeder
                 ['description' => $concern['description']],
                 [
                     'location_id' => $locations[$concern['location']] ?? null,
-                    'office_id' => $users[$concern['reporter']]?->office_id,
+                    'office_id' => null,
                     'reported_by' => $users[$concern['reporter']]?->id,
                     'status' => $concern['status'],
                     'resolution_note' => $concern['resolution_note'] ?? null,

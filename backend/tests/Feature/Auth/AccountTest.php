@@ -37,22 +37,14 @@ beforeEach(function () {
         'email' => 'ben@tcgc.edu.ph',
         'password' => 'password',
         'role' => User::ROLE_MAINTENANCE,
-        'is_active' => true,
-    ]);
-
-    $this->officeUser = User::create([
-        'name' => 'Office - Education',
-        'username' => 'educ',
-        'email' => 'educ@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
         'office_id' => $office->id,
         'is_active' => true,
     ]);
+
 });
 
 it('lets every role update its own profile', function () {
-    foreach ([$this->admin, $this->maintenance, $this->officeUser] as $user) {
+    foreach ([$this->admin, $this->maintenance] as $user) {
         $newName = $user->name.' Updated';
         $newEmail = 'updated'.$user->id.'@tcgc.edu.ph';
 
@@ -73,58 +65,58 @@ it('lets every role update its own profile', function () {
 });
 
 it('returns the updated profile with the office relation', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account', [
-            'name' => 'Office - Education',
-            'username' => 'educ',
-            'email' => 'educ@tcgc.edu.ph',
+            'name' => 'Mang Ben',
+            'username' => 'ben',
+            'email' => 'ben@tcgc.edu.ph',
         ])
         ->assertOk()
         ->assertJsonPath('user.office.name', 'Administration')
         ->assertJsonPath('user.office.location.name', 'Admin Building')
-        ->assertJsonPath('user.redirect', '/office/dashboard');
+        ->assertJsonPath('user.redirect', '/maintenance/dashboard');
 });
 
 it('rejects an email or username already in use', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account', [
-            'name' => 'Office - Education',
+            'name' => 'Mang Ben',
             'username' => 'admin',
             'email' => 'admin@tcgc.edu.ph',
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['username', 'email']);
 
-    expect($this->officeUser->fresh()->email)->toBe('educ@tcgc.edu.ph');
+    expect($this->maintenance->fresh()->email)->toBe('ben@tcgc.edu.ph');
 });
 
 it('ignores privileged fields on a self-service profile update', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account', [
-            'name' => 'Office - Education',
-            'username' => 'educ',
-            'email' => 'educ@tcgc.edu.ph',
+            'name' => 'Mang Ben',
+            'username' => 'ben',
+            'email' => 'ben@tcgc.edu.ph',
             'role' => User::ROLE_ADMIN,
             'office_id' => null,
             'is_active' => false,
         ])
         ->assertOk();
 
-    $fresh = $this->officeUser->fresh();
-    expect($fresh->role)->toBe(User::ROLE_OFFICE);
-    expect($fresh->office_id)->toBe($this->officeUser->office_id);
+    $fresh = $this->maintenance->fresh();
+    expect($fresh->role)->toBe(User::ROLE_MAINTENANCE);
+    expect($fresh->office_id)->toBe($this->maintenance->office_id);
     expect($fresh->is_active)->toBeTrue();
 });
 
 it('validates the profile fields', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account', [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['name', 'email']);
 
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account', [
-            'name' => 'Office - Education',
+            'name' => 'Mang Ben',
             'email' => 'not-an-email',
         ])
         ->assertUnprocessable()
@@ -132,7 +124,7 @@ it('validates the profile fields', function () {
 });
 
 it('changes the password with the correct current password', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account/password', [
             'current_password' => 'password',
             'password' => 'new-secret-123',
@@ -141,18 +133,18 @@ it('changes the password with the correct current password', function () {
         ->assertOk()
         ->assertJsonPath('message', 'Password changed.');
 
-    $fresh = $this->officeUser->fresh();
+    $fresh = $this->maintenance->fresh();
     expect(Hash::check('new-secret-123', $fresh->password))->toBeTrue();
     expect(Hash::check('password', $fresh->password))->toBeFalse();
 
     $this->postJson('/api/auth/login', [
-        'login' => 'educ@tcgc.edu.ph',
+        'login' => 'ben@tcgc.edu.ph',
         'password' => 'new-secret-123',
     ])->assertOk();
 });
 
 it('rejects a wrong current password', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account/password', [
             'current_password' => 'wrong-password',
             'password' => 'new-secret-123',
@@ -161,11 +153,11 @@ it('rejects a wrong current password', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('current_password');
 
-    expect(Hash::check('password', $this->officeUser->fresh()->password))->toBeTrue();
+    expect(Hash::check('password', $this->maintenance->fresh()->password))->toBeTrue();
 });
 
 it('validates the new password', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account/password', [
             'current_password' => 'password',
             'password' => 'short',
@@ -174,7 +166,7 @@ it('validates the new password', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('password');
 
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account/password', [
             'current_password' => 'password',
             'password' => 'new-secret-123',
@@ -198,15 +190,15 @@ it('requires authentication for account updates', function () {
 });
 
 it('audits profile and password changes without leaking the hash', function () {
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account', [
-            'name' => 'Office - Education',
-            'username' => 'educ',
-            'email' => 'educ@tcgc.edu.ph',
+            'name' => 'Mang Ben',
+            'username' => 'ben',
+            'email' => 'ben@tcgc.edu.ph',
         ])
         ->assertOk();
 
-    $this->actingAs($this->officeUser, 'api')
+    $this->actingAs($this->maintenance, 'api')
         ->patchJson('/api/auth/account/password', [
             'current_password' => 'password',
             'password' => 'new-secret-123',
@@ -216,14 +208,14 @@ it('audits profile and password changes without leaking the hash', function () {
 
     $passwordLog = AuditLog::where('action', 'password_changed')
         ->where('entity_type', 'User')
-        ->where('entity_id', $this->officeUser->id)
+        ->where('entity_id', $this->maintenance->id)
         ->first();
 
     expect($passwordLog)->not->toBeNull();
     expect($passwordLog->meta)->toBeNull();
 
     $logs = AuditLog::where('entity_type', 'User')
-        ->where('entity_id', $this->officeUser->id)
+        ->where('entity_id', $this->maintenance->id)
         ->get();
 
     foreach ($logs as $log) {

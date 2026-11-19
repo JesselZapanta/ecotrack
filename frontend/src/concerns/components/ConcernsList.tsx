@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { EmptyState } from "@/components/ecotrack/EmptyState"
 import { ConcernCard } from "./ConcernCard"
 import { ConcernDetailDialog } from "./ConcernDetailDialog"
@@ -59,17 +60,18 @@ export function ConcernsList({
             className="pl-9"
           />
         </div>
-        <Select value={status} onValueChange={filterStatus}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="Open">Open</SelectItem>
-            <SelectItem value="Acknowledged">Acknowledged</SelectItem>
-            <SelectItem value="Resolved">Resolved</SelectItem>
-          </SelectContent>
-        </Select>
+        <SearchSelect
+          options={[
+            { value: "all", label: "All statuses" },
+            { value: "Open", label: "Open" },
+            { value: "Acknowledged", label: "Acknowledged" },
+            { value: "Resolved", label: "Resolved" },
+          ]}
+          value={status}
+          onValueChange={filterStatus}
+          placeholder="Status"
+          triggerClassName="w-full sm:w-[180px]"
+        />
       </div>
 
       {error ? (

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
-import { AlertCircle, Download, Loader2, MapPin } from "lucide-react"
+import { AlertCircle, Download, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PageHeader } from "@/components/ecotrack/PageHeader"
 import { StatTile } from "@/components/ecotrack/StatTile"
@@ -48,8 +48,7 @@ function formatWhen(value: string) {
 }
 
 export default function Reports() {
-  const { role, user } = useAuth()
-  const isOffice = role === "office"
+  const { role } = useAuth()
 
   const [locations, setLocations] = useState<{ id: number; name: string }[]>([])
   const [categories, setCategories] = useState<{ id: number; name: string; color_code: string }[]>([])
@@ -147,11 +146,9 @@ export default function Reports() {
         eyebrow="Insights"
         title="Reports"
         subtitle={
-          isOffice
-            ? "Waste and collection data for your office location."
-            : role === "maintenance"
-              ? "Your assigned collections and waste logged."
-              : "Filter waste and collection data, then download the result as a PDF."
+          role === "maintenance"
+            ? "Your assigned collections and waste logged."
+            : "Filter waste and collection data, then download the result as a PDF."
         }
         actions={
           <Button onClick={handleDownload} disabled={downloading || loading || !report}>
@@ -189,51 +186,37 @@ export default function Reports() {
 
               <div className="space-y-1.5">
                 <Label>Location</Label>
-                {isOffice ? (
-                  <div className="flex h-11 items-center gap-2 rounded-[8px] border border-line bg-surface-2 px-3 text-[12.5px] text-ink sm:h-10">
-                    <MapPin className="size-3.5 shrink-0 text-muted-ink" />
-                    <span className="truncate">
-                      {user?.office?.location?.name ?? "No location assigned"}
-                    </span>
-                  </div>
-                ) : (
-                  <Select
-                    value={draft.locationId}
-                    onValueChange={(value) => setDraft({ ...draft, locationId: value })}
-                  >
-                    <SelectTrigger className="h-11 w-full sm:h-10">
-                      <SelectValue placeholder="All locations" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All locations</SelectItem>
-                      {locations.map((location) => (
-                        <SelectItem key={location.id} value={String(location.id)}>
-                          {location.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+                <SearchSelect
+                  options={[
+                    { value: "all", label: "All locations" },
+                    ...locations.map((location) => ({
+                      value: String(location.id),
+                      label: location.name,
+                    })),
+                  ]}
+                  value={draft.locationId}
+                  onValueChange={(value) => setDraft({ ...draft, locationId: value })}
+                  placeholder="All locations"
+                  triggerClassName="w-full"
+                />
               </div>
 
               <div className="space-y-1.5">
                 <Label>Category</Label>
-                <Select
+                <SearchSelect
+                  options={[
+                    { value: "all", label: "All categories" },
+                    ...categories.map((category) => ({
+                      value: String(category.id),
+                      label: category.name,
+                      color: category.color_code,
+                    })),
+                  ]}
                   value={draft.categoryId}
                   onValueChange={(value) => setDraft({ ...draft, categoryId: value })}
-                >
-                  <SelectTrigger className="h-11 w-full sm:h-10">
-                    <SelectValue placeholder="All categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={String(category.id)}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="All categories"
+                  triggerClassName="w-full"
+                />
               </div>
             </div>
 

@@ -22,7 +22,6 @@ import {
 const demoAccounts = [
   { role: "Administrator", email: "admin@tcgc.edu.ph" },
   { role: "Maintenance", email: "ben@tcgc.edu.ph" },
-  { role: "ICS Office", email: "ics@tcgc.edu.ph" },
 ]
 
 export default function Login() {
@@ -81,7 +80,7 @@ export default function Login() {
           <div className="hidden flex-col justify-between bg-sidebar p-8 lg:flex xl:p-10">
             <div className="flex items-center gap-2.5">
               <BrandMark size="sm" tileClassName="border-transparent" />
-              <BrandName tone="light" subtitle="TCGC" />
+              <BrandName tone="light" subtitle="Waste monitoring" />
             </div>
 
             <div className="max-w-[400px]">
@@ -131,7 +130,7 @@ export default function Login() {
           <div className="min-w-0">
             <div className="flex items-center gap-2.5 bg-sidebar px-5 py-5 lg:hidden">
               <BrandMark size="sm" tileClassName="border-transparent" />
-              <BrandName tone="light" subtitle="TCGC" />
+              <BrandName tone="light" subtitle="Waste monitoring" />
             </div>
 
             <div className="p-5 sm:p-8 lg:p-10">
@@ -244,7 +243,7 @@ export default function Login() {
       </div>
 
       <p className="mx-auto w-full max-w-[1080px] text-center text-[10px] text-muted-ink">
-        EcoTrack TCGC · Tangub City Global College · {new Date().getFullYear()}
+        TCGC EcoTrack · Tangub City Global College · {new Date().getFullYear()}
       </p>
     </div>
   )

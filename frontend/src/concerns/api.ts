@@ -1,5 +1,6 @@
 import axios from "axios"
 import api from "@/lib/api"
+import { refreshNavBadges } from "@/lib/nav-badges"
 
 export type ConcernStatus = "Open" | "Acknowledged" | "Resolved"
 
@@ -74,6 +75,7 @@ export async function createConcern(payload: {
   if (payload.photo) form.append("photo", payload.photo)
 
   const { data } = await api.post<{ concern: ApiConcern }>("/concerns", form)
+  refreshNavBadges()
   return data.concern
 }
 
@@ -86,6 +88,7 @@ export async function updateConcernStatus(
     status,
     resolution_note: resolutionNote,
   })
+  refreshNavBadges()
   return data.concern
 }
 
@@ -99,11 +102,16 @@ export function concernMessage(error: unknown): string {
 }
 
 const apiBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "/api"
+const storageBase = (
+  (import.meta.env.VITE_STORAGE_URL as string | undefined) ?? apiBase
+)
+  .replace(/\/api\/?$/, "")
+  .replace(/\/$/, "")
 
 export function mediaUrl(path: string | null): string | null {
   if (!path) return null
 
-  const origin = apiBase.replace(/\/api\/?$/, "")
+  const origin = storageBase
 
   if (/^https?:\/\//i.test(path)) {
     try {

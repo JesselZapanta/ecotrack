@@ -7,6 +7,11 @@
         @page { margin: 28px 32px 34px; }
         * { box-sizing: border-box; }
         body { font-family: "DejaVu Sans", sans-serif; font-size: 10px; color: #121814; margin: 0; }
+        .header { width: 100%; border-collapse: collapse; }
+        .header td { vertical-align: middle; padding: 0; }
+        .logo { width: 44px; height: 44px; }
+        .logo-cell { width: 50px; }
+        .brand-cell { padding-left: 10px; }
         .brand { font-size: 19px; font-weight: bold; color: #0E4A36; letter-spacing: 0.4px; }
         .brand-sub { font-size: 9px; color: #6E756D; margin-top: 2px; }
         .rule { border-top: 2px solid #0E4A36; margin: 10px 0 16px; }
@@ -30,8 +35,21 @@
     </style>
 </head>
 <body>
-    <div class="brand">EcoTrack TCGC</div>
-    <div class="brand-sub">Waste Management &amp; Monitoring | Tangub City Global College</div>
+    <table class="header">
+        <tr>
+            <td class="logo-cell">
+                <img
+                    src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('brand/tcgc-logo.png'))) }}"
+                    alt="TCGC seal"
+                    class="logo"
+                >
+            </td>
+            <td class="brand-cell">
+                <div class="brand">TCGC EcoTrack</div>
+                <div class="brand-sub">Waste Management &amp; Monitoring | Tangub City Global College</div>
+            </td>
+        </tr>
+    </table>
     <div class="rule"></div>
 
     <h1>Waste &amp; Collection Report</h1>
@@ -162,7 +180,7 @@
         Filters — period: {{ $report['filters']['date_from'] }} to {{ $report['filters']['date_to'] }};
         location: {{ $report['filters']['location']['name'] ?? 'all' }};
         category: {{ $report['filters']['category']['name'] ?? 'all' }}.<br>
-        EcoTrack TCGC | Waste Management &amp; Monitoring
+        TCGC EcoTrack | Waste Management &amp; Monitoring
     </div>
 </body>
 </html>

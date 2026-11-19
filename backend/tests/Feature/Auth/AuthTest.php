@@ -35,18 +35,10 @@ beforeEach(function () {
         'email' => 'ben@tcgc.edu.ph',
         'password' => 'password',
         'role' => User::ROLE_MAINTENANCE,
-        'is_active' => true,
-    ]);
-
-    $this->officeUser = User::create([
-        'name' => 'Office - Education',
-        'username' => 'educ',
-        'email' => 'educ@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
         'office_id' => $office->id,
         'is_active' => true,
     ]);
+
 });
 
 it('logs in with an email and returns a jwt', function () {
@@ -87,7 +79,6 @@ it('returns the role dashboard for each role', function (string $email, string $
 })->with([
     'admin' => ['admin@tcgc.edu.ph', '/admin/dashboard'],
     'maintenance' => ['ben@tcgc.edu.ph', '/maintenance/dashboard'],
-    'office' => ['educ@tcgc.edu.ph', '/office/dashboard'],
 ]);
 
 it('rejects invalid credentials', function () {
@@ -122,15 +113,15 @@ it('validates required login fields', function () {
 
 it('returns the authenticated user', function () {
     $token = $this->postJson('/api/auth/login', [
-        'login' => 'educ@tcgc.edu.ph',
+        'login' => 'ben@tcgc.edu.ph',
         'password' => 'password',
     ])->json('access_token');
 
     $this->withHeader('Authorization', "Bearer {$token}")
         ->getJson('/api/auth/me')
         ->assertOk()
-        ->assertJsonPath('user.email', 'educ@tcgc.edu.ph')
-        ->assertJsonPath('user.role', 'office')
+        ->assertJsonPath('user.email', 'ben@tcgc.edu.ph')
+        ->assertJsonPath('user.role', 'maintenance')
         ->assertJsonPath('user.office.name', 'Administration');
 });
 

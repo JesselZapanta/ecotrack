@@ -8,7 +8,6 @@ import {
   MessageSquareWarning,
   ShieldCheck,
   Truck,
-  Users,
 } from "lucide-react"
 import { BrandLockup, BrandMark } from "@/components/brand/Logo"
 import { Button } from "@/components/ui/button"
@@ -49,7 +48,7 @@ const features = [
   {
     icon: MessageSquareWarning,
     title: "Concerns & accountability",
-    text: "Offices report problems; admin and crews acknowledge, resolve and record the fix.",
+    text: "Maintenance crews report problems, resolve them and record the fix for the administrator.",
   },
 ]
 
@@ -61,16 +60,10 @@ const roles = [
     points: ["Master lists and users", "Schedules and waste records", "Concerns, reports and audit log"],
   },
   {
-    icon: Users,
-    title: "Office",
-    tag: "View only",
-    points: ["Waste and schedules for your location", "Report concerns", "Download your reports"],
-  },
-  {
     icon: Truck,
     title: "Maintenance",
     tag: "Field access",
-    points: ["Today's route and schedules", "Update collection statuses", "Log waste and resolve concerns"],
+    points: ["Today's route and schedules", "Update collection statuses", "Log waste and manage concerns"],
   },
 ]
 
@@ -83,7 +76,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-canvas">
       <header className="sticky top-0 z-30 border-b border-line bg-canvas">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          <Link to="/" aria-label="EcoTrack home" className="shrink-0">
+          <Link to="/" aria-label="TCGC EcoTrack home" className="shrink-0">
             <BrandLockup className="h-8 sm:h-9" />
           </Link>
 
@@ -115,7 +108,7 @@ export default function LandingPage() {
               Clearer data.
             </h1>
             <p className="mt-4 max-w-[520px] text-[13.5px] leading-6 text-muted-ink sm:text-[14px]">
-              EcoTrack helps Tangub City Global College schedule collections, record waste and resolve
+              TCGC EcoTrack helps Tangub City Global College schedule collections, record waste and resolve
               concerns — all in one place.
             </p>
 
@@ -132,7 +125,7 @@ export default function LandingPage() {
             </div>
 
             <p className="mt-4 text-[11px] text-muted-ink">
-              For administrators, offices and maintenance crews.
+              For administrators and maintenance crews.
             </p>
           </div>
 
@@ -211,7 +204,7 @@ export default function LandingPage() {
           Everything the campus needs
         </h2>
         <p className="mt-2 max-w-[560px] text-[12.5px] leading-5 text-muted-ink">
-          From the first schedule to the final report, EcoTrack keeps the work visible and accountable.
+          From the first schedule to the final report, TCGC EcoTrack keeps the work visible and accountable.
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -231,7 +224,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
           <p className="label">Built for every role</p>
           <h2 className="display mt-2 text-[26px] leading-tight tracking-[-0.02em] text-ink sm:text-[32px]">
-            One system, three views
+            One system, two workspaces
           </h2>
 
           <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-3">
@@ -284,7 +277,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 py-6 text-[10.5px] text-muted-ink sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <BrandMark size="xs" />
-            <span>EcoTrack TCGC · Waste Management &amp; Monitoring</span>
+            <span>TCGC EcoTrack · Waste Management &amp; Monitoring</span>
           </div>
           <span>Tangub City Global College · {new Date().getFullYear()}</span>
         </div>

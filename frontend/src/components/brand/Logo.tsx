@@ -1,19 +1,11 @@
 import { cn } from "@/lib/utils"
 
-const tileSizes = {
-  xs: "size-7 rounded-[8px]",
-  sm: "size-8 rounded-[10px]",
-  md: "size-10 rounded-[12px]",
-  lg: "size-12 rounded-[14px]",
-  xl: "size-14 rounded-[16px]",
-}
-
 const markSizes = {
-  xs: "size-4",
-  sm: "size-5",
-  md: "size-6",
-  lg: "size-7",
-  xl: "size-9",
+  xs: "size-7",
+  sm: "size-8",
+  md: "size-10",
+  lg: "size-12",
+  xl: "size-14",
 }
 
 export function BrandMark({
@@ -22,32 +14,37 @@ export function BrandMark({
   tileClassName,
   alt = "",
 }: {
-  size?: keyof typeof tileSizes
+  size?: keyof typeof markSizes
   className?: string
   tileClassName?: string
   alt?: string
 }) {
   return (
-    <span
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center border border-white/70 bg-white shadow-[var(--shadow-sm)]",
-        tileSizes[size],
-        tileClassName,
-        className
-      )}
-    >
-      <img src="/brand/logo-icon.svg" alt={alt} className={cn("block", markSizes[size])} />
+    <span className={cn("inline-flex shrink-0 items-center justify-center", markSizes[size], tileClassName, className)}>
+      <img src="/brand/tcgc-logo.png" alt={alt} className="block size-full object-contain" />
     </span>
   )
 }
 
-export function BrandLockup({ className, alt = "EcoTrack TCGC — Tangub City Global College" }: { className?: string; alt?: string }) {
-  return <img src="/brand/logo-horizontal.svg" alt={alt} className={cn("block h-9 w-auto", className)} />
+export function BrandLockup({ className }: { className?: string }) {
+  return (
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
+      <img src="/brand/tcgc-logo.png" alt="" className="h-full w-auto shrink-0" />
+      <span className="flex min-w-0 flex-col">
+        <span className="font-display text-[15px] leading-none font-bold tracking-[-0.03em] text-ink">
+          TCGC EcoTrack
+        </span>
+        <span className="mt-1 text-[8.5px] font-medium tracking-[0.12em] text-muted-ink uppercase">
+          Tangub City Global College
+        </span>
+      </span>
+    </span>
+  )
 }
 
 export function BrandName({
   className,
-  subtitle = "TCGC",
+  subtitle = "Waste monitoring",
   tone = "dark",
 }: {
   className?: string
@@ -62,7 +59,7 @@ export function BrandName({
           tone === "light" ? "text-white" : "text-ink"
         )}
       >
-        EcoTrack
+        TCGC EcoTrack
       </span>
       <span
         className={cn(

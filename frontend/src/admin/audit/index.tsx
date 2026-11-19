@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PageHeader } from "@/components/ecotrack/PageHeader"
 import { apiMessage, getAuditLogs } from "@/admin/audit/api"
@@ -107,28 +108,26 @@ export default function AuditLogPage() {
                 className="pl-9"
               />
             </div>
-            <Select
+            <SearchSelect
+              options={[
+                { value: "all", label: "All actions" },
+                { value: "created", label: "Created" },
+                { value: "updated", label: "Updated" },
+                { value: "activated", label: "Activated" },
+                { value: "deactivated", label: "Deactivated" },
+                { value: "status_changed", label: "Status changed" },
+                { value: "password_changed", label: "Password changed" },
+                { value: "deleted", label: "Deleted" },
+              ]}
               value={action}
               onValueChange={(value) => {
                 setAction(value)
                 setLoading(true)
                 setPage(1)
               }}
-            >
-              <SelectTrigger className="w-full sm:w-[160px]">
-                <SelectValue placeholder="Action" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All actions</SelectItem>
-                <SelectItem value="created">Created</SelectItem>
-                <SelectItem value="updated">Updated</SelectItem>
-                <SelectItem value="activated">Activated</SelectItem>
-                <SelectItem value="deactivated">Deactivated</SelectItem>
-                <SelectItem value="status_changed">Status changed</SelectItem>
-                <SelectItem value="password_changed">Password changed</SelectItem>
-                <SelectItem value="deleted">Deleted</SelectItem>
-              </SelectContent>
-            </Select>
+              placeholder="Action"
+              triggerClassName="w-full sm:w-[160px]"
+            />
           </div>
         }
       />

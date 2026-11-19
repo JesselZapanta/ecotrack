@@ -13,9 +13,7 @@ import { StatusUpdateDialog } from "@/admin/schedules/components/StatusUpdateDia
 import {
   apiMessage,
   deleteSchedule,
-  getCategoryOptions,
-  getLocationOptions,
-  getMaintenanceUsers,
+  getScheduleOptions,
   getSchedules,
   getSchedulesForRange,
   sweepSchedules,
@@ -43,9 +41,10 @@ function monthBounds(month: Date) {
 }
 
 export default function Schedules() {
-  const { role, user } = useAuth()
+  const { role } = useAuth()
   const isAdmin = role === "admin"
   const canUpdateStatus = role === "admin" || role === "maintenance"
+  const canSweep = role === "admin" || role === "maintenance"
 
   const [view, setView] = useState<"list" | "calendar">("list")
 
@@ -65,7 +64,6 @@ export default function Schedules() {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [refreshKey, setRefreshKey] = useState(0)
-  const [ready, setReady] = useState(false)
 
   const [categories, setCategories] = useState<FilterOption[]>([])
   const [locations, setLocations] = useState<FilterOption[]>([])
@@ -91,37 +89,6 @@ export default function Schedules() {
   }, [query])
 
   useEffect(() => {
-    if (!isAdmin) return
-
-    getCategoryOptions().then(setCategories).catch(() => setCategories([]))
-    getLocationOptions().then(setLocations).catch(() => setLocations([]))
-    getMaintenanceUsers().then(setAssignees).catch(() => setAssignees([]))
-  }, [isAdmin])
-
-  useEffect(() => {
-    let cancelled = false
-
-    sweepSchedules()
-      .then((result) => {
-        if (cancelled) return
-        if (result.swept > 0) {
-          toast.success(result.message)
-        }
-      })
-      .catch(() => {
-        // Sweep is best-effort; the list still loads.
-      })
-      .finally(() => {
-        if (!cancelled) setReady(true)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!ready) return
     let cancelled = false
 
     getSchedules({
@@ -151,7 +118,56 @@ export default function Schedules() {
     return () => {
       cancelled = true
     }
-  }, [ready, debouncedQuery, status, categoryId, locationId, date, sort, direction, page, perPage, refreshKey])
+  }, [debouncedQuery, status, categoryId, locationId, date, sort, direction, page, perPage, refreshKey])
+
+  useEffect(() => {
+    if (!isAdmin) return
+
+    let cancelled = false
+    const timer = window.setTimeout(() => {
+      getScheduleOptions()
+        .then((options) => {
+          if (cancelled) return
+          setCategories(options.categories)
+          setLocations(options.locations)
+          setAssignees(options.assignees)
+        })
+        .catch(() => {
+          if (cancelled) return
+          setCategories([])
+          setLocations([])
+          setAssignees([])
+        })
+    }, 300)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [isAdmin])
+
+  useEffect(() => {
+    if (!canSweep) return
+
+    let cancelled = false
+    const timer = window.setTimeout(() => {
+      sweepSchedules()
+        .then((result) => {
+          if (cancelled || result.swept === 0) return
+          toast.success(result.message)
+          setLoading(true)
+          setRefreshKey((key) => key + 1)
+        })
+        .catch(() => {
+          // Sweep is best-effort; the list still loads.
+        })
+    }, 700)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [canSweep])
 
   useEffect(() => {
     if (view !== "calendar") return
@@ -239,13 +255,8 @@ export default function Schedules() {
     if (!meta) return "Loading schedules…"
 
     if (role === "maintenance") return `${meta.total} collections assigned to you`
-    if (role === "office") {
-      const officeName = user?.office?.name ?? "your office"
-      const locationName = user?.office?.location?.name
-      return `${meta.total} collections at ${locationName ?? "your office location"} · ${officeName}`
-    }
     return `${meta.total} collection schedules · multi-category routes`
-  }, [loading, meta, role, user])
+  }, [loading, meta, role])
 
   return (
     <div className="space-y-5">
@@ -334,7 +345,7 @@ export default function Schedules() {
               perPage={perPage}
               canManage={isAdmin}
               canUpdateStatus={canUpdateStatus}
-              showLocations={role !== "office"}
+              showLocations
               onSort={toggleSort}
               onEdit={openEdit}
               onDelete={setDeleteTarget}

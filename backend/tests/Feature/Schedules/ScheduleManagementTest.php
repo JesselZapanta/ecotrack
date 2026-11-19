@@ -41,24 +41,9 @@ beforeEach(function () {
         'is_active' => true,
     ]);
 
-    $this->officeUser = User::create([
-        'name' => 'Office - Education',
-        'username' => 'educ',
-        'email' => 'educ@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
-        'office_id' => $this->office->id,
-        'is_active' => true,
-    ]);
 
     $this->library = Location::create(['name' => 'Library', 'building' => 'Library', 'floor_or_area' => '2nd floor']);
 
-    $this->educationOffice = $this->library->offices()->create([
-        'name' => 'College of Education',
-        'contact_person' => 'Dean Santos',
-    ]);
-
-    $this->officeUser->update(['office_id' => $this->educationOffice->id]);
 
     $this->canteen = Location::create(['name' => 'Canteen', 'building' => 'Canteen']);
 
@@ -80,6 +65,16 @@ function makeSchedule(array $overrides = []): CollectionSchedule
 
     return $schedule;
 }
+
+it('returns schedule form options in one request', function () {
+    $response = $this->actingAs($this->admin, 'api')->getJson('/api/schedules/options');
+
+    $response->assertOk()
+        ->assertJsonCount(3, 'data.categories')
+        ->assertJsonCount(3, 'data.locations')
+        ->assertJsonCount(2, 'data.assignees');
+});
+
 
 it('lists schedules with pagination metadata and relations', function () {
     $schedule = makeSchedule(['assigned_to' => $this->ben->id]);
@@ -220,7 +215,7 @@ it('rejects an assignee who is not maintenance', function () {
             'scheduled_date' => '2026-11-02',
             'window_start' => '07:00',
             'window_end' => '09:00',
-            'assigned_to' => $this->officeUser->id,
+            'assigned_to' => $this->admin->id,
             'location_ids' => [$this->library->id],
             'category_ids' => [$this->biodegradable->id],
         ])
@@ -277,21 +272,6 @@ it('scopes schedules to the assigned maintenance account', function () {
         ->assertJsonPath('data.0.assignee.name', 'Mang Ben');
 });
 
-it('scopes schedules to the office location', function () {
-    $librarySchedule = makeSchedule();
-    $librarySchedule->locations()->attach($this->library->id);
-    $librarySchedule->categories()->attach($this->biodegradable->id);
-
-    $canteenSchedule = makeSchedule(['notes' => 'Other']);
-    $canteenSchedule->locations()->attach($this->canteen->id);
-    $canteenSchedule->categories()->attach($this->recyclable->id);
-
-    $this->actingAs($this->officeUser, 'api')
-        ->getJson('/api/schedules')
-        ->assertOk()
-        ->assertJsonPath('meta.total', 1)
-        ->assertJsonPath('data.0.locations.0.name', 'Library');
-});
 
 it('lets the assigned maintenance account update status and logs history', function () {
     $schedule = makeSchedule(['assigned_to' => $this->ben->id]);
@@ -336,8 +316,8 @@ it('requires a remark when marking a schedule as missed', function () {
         ->assertJsonPath('schedule.status', 'Missed');
 });
 
-it('blocks office users from creating schedules', function () {
-    $this->actingAs($this->officeUser, 'api')
+it('blocks maintenance users from creating schedules', function () {
+    $this->actingAs($this->ben, 'api')
         ->postJson('/api/schedules', [
             'scheduled_date' => '2026-11-02',
             'window_start' => '07:00',

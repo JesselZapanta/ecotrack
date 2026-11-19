@@ -36,18 +36,10 @@ beforeEach(function () {
         'email' => 'ben@tcgc.edu.ph',
         'password' => 'password',
         'role' => User::ROLE_MAINTENANCE,
-        'is_active' => true,
-    ]);
-
-    $this->officeUser = User::create([
-        'name' => 'Office - Education',
-        'username' => 'educ',
-        'email' => 'educ@tcgc.edu.ph',
-        'password' => 'password',
-        'role' => User::ROLE_OFFICE,
         'office_id' => $this->office->id,
         'is_active' => true,
     ]);
+
 });
 
 it('lists users with pagination metadata', function () {
@@ -61,7 +53,7 @@ it('lists users with pagination metadata', function () {
             'data' => [['id', 'name', 'email', 'role', 'is_active', 'office']],
             'meta' => ['current_page', 'last_page', 'per_page', 'total', 'from', 'to'],
         ])
-        ->assertJsonPath('meta.total', 15)
+        ->assertJsonPath('meta.total', 14)
         ->assertJsonPath('meta.per_page', 5)
         ->assertJsonPath('meta.last_page', 3);
 
@@ -130,7 +122,7 @@ it('blocks non-admin users', function () {
         ->assertForbidden();
 });
 
-it('creates a user with a generated password', function () {
+it('creates a user with an admin-provided password', function () {
     $response = $this->actingAs($this->admin, 'api')
         ->postJson('/api/users', [
             'name' => 'New Staff',
@@ -138,17 +130,82 @@ it('creates a user with a generated password', function () {
             'email' => 'newstaff@tcgc.edu.ph',
             'role' => 'maintenance',
             'office_id' => $this->office->id,
+            'password' => 'secret-pass-123',
+            'password_confirmation' => 'secret-pass-123',
         ]);
 
     $response->assertCreated()
         ->assertJsonPath('user.email', 'newstaff@tcgc.edu.ph')
-        ->assertJsonPath('user.role', 'maintenance');
+        ->assertJsonPath('user.role', 'maintenance')
+        ->assertJsonMissingPath('temporary_password');
 
-    $password = $response->json('temporary_password');
     $user = User::where('email', 'newstaff@tcgc.edu.ph')->firstOrFail();
+    expect(Hash::check('secret-pass-123', $user->password))->toBeTrue();
+});
 
-    expect($password)->toBeString()->not->toBeEmpty();
-    expect(Hash::check($password, $user->password))->toBeTrue();
+it('requires a confirmed password when creating a user', function () {    $this->actingAs($this->admin, 'api')
+        ->postJson('/api/users', [
+            'name' => 'No Password',
+            'email' => 'nopass@tcgc.edu.ph',
+            'role' => 'maintenance',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('password');
+
+    $this->actingAs($this->admin, 'api')
+        ->postJson('/api/users', [
+            'name' => 'Mismatch',
+            'email' => 'mismatch@tcgc.edu.ph',
+            'role' => 'maintenance',
+            'password' => 'secret-pass-123',
+            'password_confirmation' => 'different-pass',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('password');
+});
+
+it('lets an admin update a user password', function () {
+    $this->actingAs($this->admin, 'api')
+        ->patchJson("/api/users/{$this->maintenance->id}/password", [
+            'password' => 'new-secret-123',
+            'password_confirmation' => 'new-secret-123',
+        ])
+        ->assertOk()
+        ->assertJsonPath('message', 'Password updated.');
+
+    expect(Hash::check('new-secret-123', $this->maintenance->fresh()->password))->toBeTrue();
+});
+
+it('validates the new user password', function () {
+    $this->actingAs($this->admin, 'api')
+        ->patchJson("/api/users/{$this->maintenance->id}/password", [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('password');
+
+    $this->actingAs($this->admin, 'api')
+        ->patchJson("/api/users/{$this->maintenance->id}/password", [
+            'password' => 'short',
+            'password_confirmation' => 'short',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('password');
+
+    $this->actingAs($this->admin, 'api')
+        ->patchJson("/api/users/{$this->maintenance->id}/password", [
+            'password' => 'new-secret-123',
+            'password_confirmation' => 'different-secret',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('password');
+});
+
+it('blocks non-admin users from updating passwords', function () {
+    $this->actingAs($this->maintenance, 'api')
+        ->patchJson("/api/users/{$this->maintenance->id}/password", [
+            'password' => 'new-secret-123',
+            'password_confirmation' => 'new-secret-123',
+        ])
+        ->assertForbidden();
 });
 
 it('validates unique email and username', function () {
@@ -157,7 +214,9 @@ it('validates unique email and username', function () {
             'name' => 'Duplicate',
             'username' => 'ben',
             'email' => 'ben@tcgc.edu.ph',
-            'role' => 'office',
+            'role' => 'maintenance',
+            'password' => 'secret-pass-123',
+            'password_confirmation' => 'secret-pass-123',
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['email', 'username']);
@@ -193,6 +252,6 @@ it('prevents an admin from deactivating themselves', function () {
 
 it('prevents an admin from changing their own role', function () {
     $this->actingAs($this->admin, 'api')
-        ->patchJson("/api/users/{$this->admin->id}", ['role' => 'office'])
+        ->patchJson("/api/users/{$this->admin->id}", ['role' => 'maintenance'])
         ->assertUnprocessable();
 });

@@ -12,7 +12,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 
 class ReportController extends Controller
 {
@@ -23,10 +22,6 @@ class ReportController extends Controller
         $locations = Location::query()
             ->where('is_active', true)
             ->orderBy('name');
-
-        if ($user->isOffice()) {
-            $locations->whereKey($user->office?->location_id);
-        }
 
         return response()->json([
             'locations' => $locations->get(['id', 'name']),
@@ -70,18 +65,7 @@ class ReportController extends Controller
         $dateFrom = $data['date_from'];
         $dateTo = $data['date_to'];
         $categoryId = $data['category_id'] ?? null;
-
-        if ($user->isOffice()) {
-            $locationId = $user->office?->location_id;
-
-            if (! $locationId) {
-                throw ValidationException::withMessages([
-                    'location_id' => 'Your office has no assigned location yet.',
-                ]);
-            }
-        } else {
-            $locationId = $data['location_id'] ?? null;
-        }
+        $locationId = $data['location_id'] ?? null;
 
         $records = WasteRecord::query()
             ->whereBetween('waste_records.date', [$dateFrom, $dateTo]);
@@ -160,9 +144,7 @@ class ReportController extends Controller
         return [
             'scope' => $user->isAdmin()
                 ? 'All waste records and schedules'
-                : ($user->isOffice()
-                    ? 'Office location: '.($location?->name ?? 'Not assigned')
-                    : 'Assigned collections and waste logged by '.$user->name),
+                : 'Assigned collections and waste logged by '.$user->name,
             'filters' => [
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,

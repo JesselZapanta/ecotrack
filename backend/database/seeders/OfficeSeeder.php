@@ -75,7 +75,7 @@ class OfficeSeeder extends Seeder
                 ['room_name' => 'SHS-202', 'floor' => 'Second Floor', 'type' => 'Lecture Room', 'status' => 'Active'],
                 ['room_name' => 'Rest Room (SHS Second Floor)', 'floor' => 'Second Floor', 'type' => 'Facility', 'status' => 'Active'],
             ],
-            'Main Building — Ground Floor — Left Side' => [
+            'Main Building — Ground Floor — Left Wing' => [
                 ['room_name' => 'OJT & Placement Alumni Affairs', 'floor' => 'Ground Floor', 'type' => 'Office', 'status' => 'Active'],
                 ['room_name' => 'Scholarship & Welfare Office', 'floor' => 'Ground Floor', 'type' => 'Office', 'status' => 'Active'],
                 ['room_name' => 'Records Section', 'floor' => 'Ground Floor', 'type' => 'Office', 'status' => 'Active'],
@@ -94,7 +94,7 @@ class OfficeSeeder extends Seeder
                 ['room_name' => 'Rest Rooms (Main Ground Floor Left)', 'floor' => 'Ground Floor', 'type' => 'Facility', 'status' => 'Active'],
                 ['room_name' => 'Food Court', 'floor' => 'Ground Floor', 'type' => 'Facility', 'status' => 'Active'],
             ],
-            'Main Building — Ground Floor — Right Side' => [
+            'Main Building — Ground Floor — Right Wing' => [
                 ['room_name' => 'Medical and Dental Clinic', 'floor' => 'Ground Floor', 'type' => 'Facility', 'status' => 'Active'],
                 ['room_name' => 'MB-105', 'floor' => 'Ground Floor', 'type' => 'Lecture Room', 'status' => 'Active'],
                 ['room_name' => 'MB-103 (Demo Room)', 'floor' => 'Ground Floor', 'type' => 'Lecture Room', 'status' => 'Active'],
@@ -110,7 +110,7 @@ class OfficeSeeder extends Seeder
                 ['room_name' => 'Rest Rooms (Main Ground Floor Right)', 'floor' => 'Ground Floor', 'type' => 'Facility', 'status' => 'Active'],
                 ['room_name' => 'Elevator (Main Ground Floor)', 'floor' => 'Ground Floor', 'type' => 'Facility', 'status' => 'Active'],
             ],
-            'Main Building — Second Floor — Left Side' => [
+            'Main Building — Second Floor — Left Wing' => [
                 ['room_name' => 'VP for Academic Affairs', 'floor' => 'Second Floor', 'type' => 'Office', 'status' => 'Active'],
                 ['room_name' => "Dean's Office", 'floor' => 'Second Floor', 'type' => 'Office', 'status' => 'Active'],
                 ['room_name' => 'MB-214', 'floor' => 'Second Floor', 'type' => 'Lecture Room', 'status' => 'Active'],
@@ -131,7 +131,7 @@ class OfficeSeeder extends Seeder
                 ['room_name' => "Visitor's Lounge", 'floor' => 'Second Floor', 'type' => 'Facility', 'status' => 'Active'],
                 ['room_name' => 'Elevator (Main Second Floor)', 'floor' => 'Second Floor', 'type' => 'Facility', 'status' => 'Active'],
             ],
-            'Main Building — Second Floor — Right Side' => [
+            'Main Building — Second Floor — Right Wing' => [
                 ['room_name' => 'Faculty & Staff Lounge', 'floor' => 'Second Floor', 'type' => 'Facility', 'status' => 'Active'],
                 ['room_name' => 'Speech Laboratory', 'floor' => 'Second Floor', 'type' => 'Laboratory', 'status' => 'Active'],
                 ['room_name' => 'MB-208 (Second Floor Right)', 'floor' => 'Second Floor', 'type' => 'Lecture Room', 'status' => 'Active'],

@@ -1,4 +1,4 @@
-export type Role = "admin" | "maintenance" | "office"
+export type Role = "admin" | "maintenance"
 
 export type WasteCategory = {
   id: string
@@ -90,24 +90,22 @@ export type Concern = {
 }
 
 export const concerns: Concern[] = [
-  { id: "k1", locationId: "l2", description: "Overflowing bin near canteen entrance, not collected yesterday.", status: "Open", reportedBy: "Office - Business", date: "2026-10-25" },
+  { id: "k1", locationId: "l2", description: "Overflowing bin near canteen entrance, not collected yesterday.", status: "Open", reportedBy: "Mang Ben", date: "2026-10-25" },
   { id: "k2", locationId: "l5", description: "Improper disposal — mixed waste in residual bin.", status: "Acknowledged", reportedBy: "Mang Ben", date: "2026-10-24" },
-  { id: "k3", locationId: "l3", description: "Missed pickup, library 2nd floor.", status: "Resolved", reportedBy: "Office - Education", date: "2026-10-23" },
+  { id: "k3", locationId: "l3", description: "Missed pickup, library 2nd floor.", status: "Resolved", reportedBy: "Ate Cora", date: "2026-10-23" },
 ]
 
 export const users = [
   { id: "u1", name: "Admin TCGC", email: "admin@tcgc.edu.ph", role: "admin" as Role, officeId: "o3", active: true },
   { id: "u2", name: "Mang Ben", email: "ben@tcgc.edu.ph", role: "maintenance" as Role, officeId: null, active: true },
   { id: "u3", name: "Ate Cora", email: "cora@tcgc.edu.ph", role: "maintenance" as Role, officeId: null, active: true },
-  { id: "u4", name: "Office - Education", email: "educ@tcgc.edu.ph", role: "office" as Role, officeId: "o1", active: true },
-  { id: "u5", name: "Office - Business", email: "business@tcgc.edu.ph", role: "office" as Role, officeId: "o2", active: true },
 ]
 
 export const auditLog = [
   { id: "a1", user: "Admin TCGC", action: "Created", entity: "Waste record", entityId: "w1", detail: "Canteen · 12.5 kg · Biodegradable", at: "2026-10-24 08:12" },
   { id: "a2", user: "Mang Ben", action: "Status → Collected", entity: "Schedule", entityId: "s2", detail: "Canteen 07:00-09:00", at: "2026-10-25 07:05" },
   { id: "a3", user: "Admin TCGC", action: "Updated", entity: "Schedule", entityId: "s5", detail: "Marked as Missed — Rain", at: "2026-10-23 09:30" },
-  { id: "a4", user: "Office - Business", action: "Reported", entity: "Concern", entityId: "k1", detail: "Overflowing bin — Canteen", at: "2026-10-25 09:45" },
+  { id: "a4", user: "Mang Ben", action: "Reported", entity: "Concern", entityId: "k1", detail: "Overflowing bin — Canteen", at: "2026-10-25 09:45" },
 ]
 
 export function catById(id: string) { return wasteCategories.find(c => c.id === id)! }

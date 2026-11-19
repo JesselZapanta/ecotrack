@@ -11,6 +11,7 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  KeyRound,
   Pencil,
   Power,
   UsersRound,
@@ -19,7 +20,6 @@ import {
 const roleLabel: Record<Role, string> = {
   admin: "Administrator",
   maintenance: "Maintenance",
-  office: "Office",
 }
 
 function SortHead({
@@ -68,6 +68,7 @@ type Props = {
   perPage: number
   onSort: (column: SortColumn) => void
   onEdit: (user: ApiUser) => void
+  onPassword: (user: ApiUser) => void
   onToggle: (user: ApiUser) => void
   onPerPageChange: (value: number) => void
   onPageChange: (page: number) => void
@@ -82,6 +83,7 @@ export function UsersTable({
   perPage,
   onSort,
   onEdit,
+  onPassword,
   onToggle,
   onPerPageChange,
   onPageChange,
@@ -145,6 +147,14 @@ export function UsersTable({
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)}>
                           <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => onPassword(user)}
+                          aria-label={`Update password for ${user.name}`}
+                        >
+                          <KeyRound className="size-4" />
                         </Button>
                         <Button
                           variant="ghost"

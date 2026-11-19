@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchSelect } from "@/components/SearchSelect"
 import { OFFICE_TYPES, type LocationOption } from "@/admin/offices/types"
 import { Loader2, Search } from "lucide-react"
 
@@ -44,33 +44,27 @@ export function OfficesToolbar({
         )}
       </div>
 
-      <Select value={location} onValueChange={onLocationChange}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Location" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All locations</SelectItem>
-          {locations.map((item) => (
-            <SelectItem key={item.id} value={String(item.id)}>
-              {item.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <SearchSelect
+        options={[
+          { value: "all", label: "All locations" },
+          ...locations.map((item) => ({ value: String(item.id), label: item.name })),
+        ]}
+        value={location}
+        onValueChange={onLocationChange}
+        placeholder="Location"
+        triggerClassName="w-full sm:w-[180px]"
+      />
 
-      <Select value={type} onValueChange={onTypeChange}>
-        <SelectTrigger className="w-full sm:w-[160px]">
-          <SelectValue placeholder="Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All types</SelectItem>
-          {OFFICE_TYPES.map((item) => (
-            <SelectItem key={item} value={item}>
-              {item}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <SearchSelect
+        options={[
+          { value: "all", label: "All types" },
+          ...OFFICE_TYPES.map((item) => ({ value: item, label: item })),
+        ]}
+        value={type}
+        onValueChange={onTypeChange}
+        placeholder="Type"
+        triggerClassName="w-full sm:w-[160px]"
+      />
 
       {filtersActive && (
         <Button variant="ghost" size="sm" onClick={onClear}>
