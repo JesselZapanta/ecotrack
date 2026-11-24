@@ -38,11 +38,9 @@
     <table class="header">
         <tr>
             <td class="logo-cell">
-                <img
-                    src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('brand/tcgc-logo.png'))) }}"
-                    alt="TCGC seal"
-                    class="logo"
-                >
+            @if($logo)
+                <img src="{{ $logo }}" alt="TCGC seal" class="logo">
+            @endif
             </td>
             <td class="brand-cell">
                 <div class="brand">TCGC EcoTrack</div>

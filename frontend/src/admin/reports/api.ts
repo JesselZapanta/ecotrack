@@ -77,11 +77,22 @@ export async function getReport(filters: ReportFilters): Promise<Report> {
 }
 
 export async function downloadReportPdf(filters: ReportFilters): Promise<Blob> {
-  const { data } = await api.get<Blob>("/reports/waste-summary/pdf", {
-    params: params(filters),
-    responseType: "blob",
-  })
-  return data
+  try {
+    const { data } = await api.get<Blob>("/reports/waste-summary/pdf", {
+      params: params(filters),
+      responseType: "blob",
+    })
+    return data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data instanceof Blob) {
+      try {
+        error.response.data = JSON.parse(await error.response.data.text())
+      } catch {
+        // Non-JSON error body; keep the original blob.
+      }
+    }
+    throw error
+  }
 }
 
 export function reportMessage(error: unknown): string {

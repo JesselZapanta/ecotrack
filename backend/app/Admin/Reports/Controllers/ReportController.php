@@ -42,7 +42,10 @@ class ReportController extends Controller
     {
         $report = $this->buildReport($request);
 
-        $pdf = Pdf::loadView('reports.waste-summary', ['report' => $report])
+        $pdf = Pdf::loadView('reports.waste-summary', [
+            'report' => $report,
+            'logo' => $this->reportLogo(),
+        ])
             ->setPaper('a4');
 
         $filename = 'ecotrack-report-'
@@ -52,6 +55,35 @@ class ReportController extends Controller
             .'.pdf';
 
         return $pdf->download($filename);
+    }
+
+    /**
+     * Dompdf needs GD to embed transparent PNGs. The JPEG seal keeps the
+     * report header working on servers without the extension, with a
+     * guarded PNG fallback.
+     */
+    private function reportLogo(): ?string
+    {
+        $candidates = [
+            ['brand/tcgc-logo-print.jpg', 'image/jpeg'],
+            ['brand/tcgc-logo.png', 'image/png'],
+        ];
+
+        foreach ($candidates as [$file, $mime]) {
+            if ($mime === 'image/png' && ! function_exists('imagecreatetruecolor')) {
+                continue;
+            }
+
+            $path = public_path($file);
+
+            if (! is_file($path)) {
+                continue;
+            }
+
+            return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($path));
+        }
+
+        return null;
     }
 
     /**
